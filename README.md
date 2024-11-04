@@ -1,3 +1,6 @@
+# Lisp Team
+# Final Project CS509 Fall24- Auction House
+
 This is a stand-alone implementation of a React calculator. There are two branches in this repository (`main` and `aws`).
 
 ## Team Lisp: 
