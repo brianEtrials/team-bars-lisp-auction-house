@@ -29,14 +29,24 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 ### Iteration 1: Use Cases
 
   Buyer/Seller Open Account
+  
   Buyer/Seller Close Account
+  
   Buyer/Seller Login Account
+  
   Buyer Add Funds
+  
   Seller Add Item
+
   Seller Review Item
+  
   Seller Edit Item 
+
   Seller Remove Inactive Item
+  
   Seller Publish Item
+  
   Seller Unpublish Item 
+  
 
 #### Landing Pages for Use Cases Iteration 1:
