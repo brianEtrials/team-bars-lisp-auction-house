@@ -8,7 +8,6 @@ export default function FetchItemsComponent() {
     iDescription: '',
     iImage: '',
     iStartingPrice: '',
-    iStartDate: '',
     iDuration: ''
   });
 
@@ -49,7 +48,7 @@ export default function FetchItemsComponent() {
       });
       alert('Item added successfully!');
       
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', iStartDate: '', iDuration: '' });
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', iDuration: '' });
       
       fetchItems();
     } catch (error) {
@@ -66,7 +65,6 @@ export default function FetchItemsComponent() {
         <input name="iDescription" value={newItem.iDescription} onChange={handleInputChange} placeholder="Description" style={{ padding: '8px', fontSize: '16px' }} required />
         <input name="iImage" value={newItem.iImage} onChange={handleInputChange} placeholder="Image URL" style={{ padding: '8px', fontSize: '16px' }} required />
         <input name="iStartingPrice" type="number" value={newItem.iStartingPrice} onChange={handleInputChange} placeholder="Starting Price" style={{ padding: '8px', fontSize: '16px' }} required />
-        <input name="iStartDate" type="date" value={newItem.iStartDate} onChange={handleInputChange} style={{ padding: '8px', fontSize: '16px' }} />
         <input name="iDuration" type="number" value={newItem.iDuration} onChange={handleInputChange} placeholder="Duration (days)" style={{ padding: '8px', fontSize: '16px' }} />
         <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px' }}>
           Add Item
