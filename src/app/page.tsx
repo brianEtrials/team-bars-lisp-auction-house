@@ -1,6 +1,7 @@
 'use client'
 import React from 'react';
 import FetchItemsComponent from './add_review_items';
+import BuyerAccountPage from './buyerAccountPage';
 
 export default function Page() {
   return (
@@ -10,8 +11,8 @@ export default function Page() {
         alt="Auction House Logo" 
         style={{ width: '50px', height: 'auto' }}
       />
-
       <FetchItemsComponent />
+      <BuyerAccountPage/>
     </div>
   );
 }
