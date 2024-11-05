@@ -8,26 +8,20 @@ export default function FetchItemsComponent() {
     iDescription: '',
     iImage: '',
     iStartingPrice: '',
-    iStartDate: '',
     iDuration: ''
   });
 
-  // Function to fetch items from the API
   const fetchItems = async () => {
     try {
       const response = await axios.get('https://6fcuh9wqla.execute-api.us-east-1.amazonaws.com/review-items');
-      console.log("API Response:", response);
-  
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
-  
       setItems(responseData.items || []);
     } catch (error) {
       console.error('Failed to fetch items:', error);
       setItems([]);
     }
-  };  
+  };
 
-  // Fetch items when the component mounts
   useEffect(() => {
     fetchItems();
   }, []);
@@ -48,9 +42,7 @@ export default function FetchItemsComponent() {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', iStartDate: '', iDuration: '' });
-      
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', iDuration: '' });
       fetchItems();
     } catch (error) {
       console.error('Failed to add item:', error.response || error.message);
@@ -60,20 +52,39 @@ export default function FetchItemsComponent() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Add New Item</h1>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>ADD A NEW ITEM</h1>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '500px', margin: '0 auto', paddingBottom: '20px' }}>
-        <input name="iName" value={newItem.iName} onChange={handleInputChange} placeholder="Item Name" style={{ padding: '8px', fontSize: '16px' }} required />
-        <input name="iDescription" value={newItem.iDescription} onChange={handleInputChange} placeholder="Description" style={{ padding: '8px', fontSize: '16px' }} required />
-        <input name="iImage" value={newItem.iImage} onChange={handleInputChange} placeholder="Image URL" style={{ padding: '8px', fontSize: '16px' }} required />
-        <input name="iStartingPrice" type="number" value={newItem.iStartingPrice} onChange={handleInputChange} placeholder="Starting Price" style={{ padding: '8px', fontSize: '16px' }} required />
-        <input name="iStartDate" type="date" value={newItem.iStartDate} onChange={handleInputChange} style={{ padding: '8px', fontSize: '16px' }} />
-        <input name="iDuration" type="number" value={newItem.iDuration} onChange={handleInputChange} placeholder="Duration (days)" style={{ padding: '8px', fontSize: '16px' }} />
-        <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Item Name *</label>
+          <input name="iName" value={newItem.iName} onChange={handleInputChange} placeholder="Item Name" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Description *</label>
+          <input name="iDescription" value={newItem.iDescription} onChange={handleInputChange} placeholder="Description" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Image URL *</label>
+          <input name="iImage" value={newItem.iImage} onChange={handleInputChange} placeholder="Image URL" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Starting Price *</label>
+          <input name="iStartingPrice" type="number" value={newItem.iStartingPrice} onChange={handleInputChange} placeholder="Starting Price" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Duration (days)</label>
+          <input name="iDuration" type="number" value={newItem.iDuration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
+        </div>
+
+        <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px', marginTop: '10px' }}>
           Add Item
         </button>
       </div>
 
-      <h2 style={{ textAlign: 'center', marginTop: '20px' }}>Items List</h2>
+      <h2 style={{ textAlign: 'center', marginTop: '20px' }}>REVIEW ITEMS</h2>
       {items.length > 0 ? (
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1em', fontFamily: 'Arial, sans-serif' }}>
           <thead>
