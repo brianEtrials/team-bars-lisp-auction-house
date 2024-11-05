@@ -4,8 +4,11 @@ This is a stand-alone implementation of a React calculator. There are two branch
 
 ## Lisp Team: 
   -Sharvi Nitin Ghogale
+  
   -Rohan Rana
+  
   -Brian Rojas
+  
   -Antonela Tamagnini
 
 ## Getting Started
