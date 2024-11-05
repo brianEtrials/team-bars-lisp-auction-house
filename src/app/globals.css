@@ -9,8 +9,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ededed;
+    --foreground: #0a0a0a;
   }
 }
 
@@ -24,6 +24,7 @@ body {
   border-width: 2px;
 }
 
+
 .button{
   font: bold 11px Arial;
   text-decoration: none;
@@ -34,4 +35,40 @@ body {
   border-right: 1px solid #333333;
   border-bottom: 1px solid #333333;
   border-left: 1px solid #CCCCCC;
+}
+
+
+#design {
+  display: flex;
+  flex-direction: column;  /* Arrange items vertically */
+  align-items: center;     /* Center items horizontally */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 300px;            /* Adjust box width as needed */
+  background-color: #f9f9f9;
+  margin: 0 auto;          /* Center the box on the page */
+}
+
+
+
+.funds {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+
+button.Add {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button.Add:hover {
+  background-color: #0056b3; /* Darken button on hover */
 }
