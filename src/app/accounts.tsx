@@ -2,13 +2,17 @@ import { useState } from 'react';
 import axios from 'axios';
 
 export default function Accounts() {
+  // Initial state for account information
   const [info, setAccountInfo] = useState({
-    username: '',
-    password: '',
-    email: ''
+    firstName: '',
+    lastName: '',
+    email: '',
+    funds: '',
+    accountType: 'buyer' // Default account type
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle input changes
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setAccountInfo((prevInfo) => ({
       ...prevInfo,
@@ -16,33 +20,55 @@ export default function Accounts() {
     }));
   };
 
-  const handleCreateAccount = async (e: React.FormEvent) => {
-    e.preventDefault(); // prevents page from reloading after form submission
+  // Handle form submission to create an account
+  const handleCreateAccount = async (e) => {
+    e.preventDefault(); // Prevents page from reloading after form submission
+
+    // Preparing the request data
+    const accountData = {
+      firstName: info.firstName,
+      lastName: info.lastName,
+      email: info.email,
+      funds: parseFloat(info.funds) || 0.0, // Converts funds to a number
+      accountType: info.accountType
+    };
+
     try {
-      await axios.post('endpoint', info, { headers: { 'Content-Type': 'application/json' } });
+      // Sending a POST request to the Lambda function endpoint
+      // This needs to be corrected!
+      await axios.post('arn:aws:lambda:us-east-1:145023132401:function:CreateAccount', accountData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
       console.log('Successful creation of account');
-      setAccountInfo({ username: '', password: '', email: '' });
-    } catch {
-      console.log('Error when creating account');
+      // Reset form fields after successful submission
+      setAccountInfo({
+        firstName: '',
+        lastName: '',
+        email: '',
+        funds: '',
+        accountType: 'buyer'
+      });
+    } catch (error) {
+      console.log('Error when creating account:', error);
     }
-    console.log("Account created with:", info);
+    console.log("Account created with:", accountData);
   };
 
   return (
     <form onSubmit={handleCreateAccount}>
       <input
         type="text"
-        name="username"
-        value={info.username}
+        name="firstName"
+        value={info.firstName}
         onChange={handleInputChange}
-        placeholder="Username"
+        placeholder="First Name"
       />
       <input
-        type="password"
-        name="password"
-        value={info.password}
+        type="text"
+        name="lastName"
+        value={info.lastName}
         onChange={handleInputChange}
-        placeholder="Password"
+        placeholder="Last Name"
       />
       <input
         type="email"
@@ -51,6 +77,22 @@ export default function Accounts() {
         onChange={handleInputChange}
         placeholder="Email"
       />
+      <input
+        type="number"
+        step="0.01"
+        name="funds"
+        value={info.funds}
+        onChange={handleInputChange}
+        placeholder="Funds"
+      />
+      <select
+        name="accountType"
+        value={info.accountType}
+        onChange={handleInputChange}
+      >
+        <option value="buyer">Buyer</option>
+        <option value="seller">Seller</option>
+      </select>
       <button type="submit">Create Account</button>
     </form>
   );
