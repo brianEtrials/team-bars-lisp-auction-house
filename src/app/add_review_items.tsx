@@ -10,12 +10,14 @@ export default function FetchItemsComponent() {
     iStartingPrice: '',
     iDuration: ''
   });
+  const [redraw, forceRedraw] = useState(0);
 
   const fetchItems = async () => {
     try {
       const response = await axios.get('https://6fcuh9wqla.execute-api.us-east-1.amazonaws.com/review-items');
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
       setItems(responseData.items || []);
+      forceRedraw(redraw + 1);
     } catch (error) {
       console.error('Failed to fetch items:', error);
       setItems([]);
@@ -50,6 +52,44 @@ export default function FetchItemsComponent() {
     }
   };
 
+  const deleteitem = async (item_ID) => {
+    try {
+      await axios.post('https://ol1cazlhx6.execute-api.us-east-1.amazonaws.com/remove-item', { item_ID }, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      alert('Item deleted successfully!');
+      fetchItems();
+    } catch (error) {
+      console.error('Failed to delete item:', error.response || error.message);
+      alert('Failed to delete item: ' + (error.response ? error.response.data.message : error.message));
+    }
+  };
+
+  const selected_action = (itemId, action) => {
+    console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
+    if (action === 'Remove') {
+      deleteitem(itemId);
+    } 
+    else if (action == 'Publish'){
+
+    }
+    else if (action == 'Unpublish'){
+
+    }
+    else if(action == 'Fulfill'){
+    
+     }
+     else if(action == 'Remove'){
+
+    }
+    else if(action == 'Remove'){
+
+    }
+    else{
+      alert("Select to proceed")
+     } 
+    }
+
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>ADD A NEW ITEM</h1>
@@ -58,27 +98,22 @@ export default function FetchItemsComponent() {
           <label style={{ width: '150px', fontWeight: 'bold' }}>Item Name *</label>
           <input name="iName" value={newItem.iName} onChange={handleInputChange} placeholder="Item Name" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Description *</label>
           <input name="iDescription" value={newItem.iDescription} onChange={handleInputChange} placeholder="Description" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Image URL *</label>
           <input name="iImage" value={newItem.iImage} onChange={handleInputChange} placeholder="Image URL" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Starting Price *</label>
           <input name="iStartingPrice" type="number" value={newItem.iStartingPrice} onChange={handleInputChange} placeholder="Starting Price" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Duration (days)</label>
           <input name="iDuration" type="number" value={newItem.iDuration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
         </div>
-
         <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px', marginTop: '10px' }}>
           Add Item
         </button>
@@ -107,22 +142,23 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
-                  <img src={item.iImage} alt="Item" style={{ width: '50px', height: 'auto' }} />
-                </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStartingPrice}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage} alt={item.iName} width="100" /></td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStartDate}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iEndDate}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
-                  <select style={{ color: '#aaa' }}>
-                    <option disabled>Publish</option>
-                    <option disabled>Unpublish</option>
-                    <option disabled>Fulfil</option>
-                    <option disabled>Remove</option>
-                    <option disabled>Archive</option>
-                    <option disabled>Unfreeze</option>
+                  <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
+                    <option value="Action" disabled>Action</option>
+                    {/* <option value="Remove">Remove</option> */}
+                    <option value="Publish">Publish</option>
+                    <option disabled value="Unpublish">Unpublish</option>
+                    <option disabled value="Fulfill">Fulfill</option>
+                    <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
+                    <option value="Archive">Archive</option>
+                    <option disabled value="Unfreeze">Unfreeze</option>
+                    {/* Add more options if needed */}
                   </select>
                 </td>
               </tr>
@@ -130,7 +166,7 @@ export default function FetchItemsComponent() {
           </tbody>
         </table>
       ) : (
-        <p style={{ textAlign: 'center', marginTop: '20px' }}>No items found</p>
+        <p style={{ textAlign: 'center' }}>No items available for review.</p>
       )}
     </div>
   );
