@@ -36,7 +36,7 @@ export default function Accounts() {
     try {
       // Sending a POST request to the Lambda function endpoint
       // This needs to be corrected!
-      await axios.post('arn:aws:lambda:us-east-1:145023132401:function:CreateAccount', accountData, {
+      await axios.post('https://56jlr8kgak.execute-api.us-east-1.amazonaws.com/initial/create-account', accountData, {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Successful creation of account');
