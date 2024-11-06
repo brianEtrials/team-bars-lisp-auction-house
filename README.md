@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Notes:
 
-- When adding a new item, its status is 'inactive' by default. Seller is able to enter Name, Description, Image, Price, of the product. Only when 'Publish' action is selected, Seller is able to enter duration. Once published, Start Date starts running and End Date will be calculated from duration + Start Date.
+- When adding a new item, its status is 'inactive' by default. Seller is able to enter Name, Description, Image, Price, of the product. Once published, Start Date is set to current day, and End Date will be calculated from duration + Start Date.
 - Item ID will be automatically created in incremental order by the database.
 - (include pic of the database with items added)
 - In the frontend, the user submits the Start Date and End Date in the form of date and it will converted into to seconds on the API, which is then stored in the form of int in the database.
