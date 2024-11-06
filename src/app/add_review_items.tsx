@@ -153,11 +153,11 @@ export default function FetchItemsComponent() {
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
                     <option value="Publish">Publish</option>
-                    <option value="Unpublish">Unpublish</option>
-                    <option value="Fulfill">Fulfill</option>
+                    <option disabled value="Unpublish">Unpublish</option>
+                    <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'publish'}>Remove</option>
                     <option value="Archive">Archive</option>
-                    <option value="Unfreeze">Unfreeze</option>
+                    <option disabled value="Unfreeze">Unfreeze</option>
                     {/* Add more options if needed */}
                   </select>
                 </td>
