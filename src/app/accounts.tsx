@@ -1,5 +1,6 @@
-import { useState } from 'react';
+'use client'
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 
 export default function Accounts() {
   // Initial state for account information
