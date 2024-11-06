@@ -147,17 +147,17 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStartDate}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iEndDate}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iDuration}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
                     <option value="Publish">Publish</option>
-                    <option value="Unpublish">Unpublish</option>
-                    <option value="Fulfill">Fulfill</option>
-                    <option value="Remove" disabled={item.iStatus === 'publish'}>Remove</option>
+                    <option disabled value="Unpublish">Unpublish</option>
+                    <option disabled value="Fulfill">Fulfill</option>
+                    <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>
-                    <option value="Unfreeze">Unfreeze</option>
+                    <option disabled value="Unfreeze">Unfreeze</option>
                     {/* Add more options if needed */}
                   </select>
                 </td>
