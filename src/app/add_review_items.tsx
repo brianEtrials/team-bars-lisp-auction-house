@@ -152,8 +152,8 @@ export default function FetchItemsComponent() {
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish">Publish</option>
-                    <option disabled value="Unpublish">Unpublish</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus)}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus)}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>
