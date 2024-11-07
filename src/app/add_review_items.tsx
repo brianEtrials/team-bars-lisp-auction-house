@@ -65,13 +65,48 @@ export default function FetchItemsComponent() {
     }
   };
 
+  const publishItem = async (item_ID) => {
+
+    const itemToPublish = items.find((item) => item.item_ID === item_ID);
+    const { duration, iStartingPrice } = itemToPublish;
+    const durationValue = Number(duration);
+    const startingPriceValue = Number(iStartingPrice);
+  
+    if (isNaN(durationValue) || durationValue < 1) {
+      alert('Duration must be a number equal to or greater than 1.');
+      return;
+    }
+  
+    if (isNaN(startingPriceValue) || startingPriceValue <= 0 || !Number.isInteger(startingPriceValue)) {
+      alert('Starting price must be a positive integer greater than 0.');
+      return;
+    }
+  
+    try {
+      await axios.post('https://k5scly63ii.execute-api.us-east-1.amazonaws.com/publish-item', { item_ID, durationValue }, {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      alert('Item published successfully!');
+      fetchItems();
+    } catch (error) {
+      console.error('Failed to publish item:', error.response || error.message);
+      alert(
+        'Failed to publish item: ' +
+          (error.response ? error.response.data.message : error.message)
+      );
+    }
+  };
+  
+
+
   const selected_action = (itemId, action) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
       deleteitem(itemId);
     } 
     else if (action == 'Publish'){
-
+      publishItem(itemId);
     }
     else if (action == 'Unpublish'){
 
