@@ -82,28 +82,21 @@ export default function Accounts() {
     // initial login data
     const loginData = {
       username: loginInfo.username,
-      password: loginInfo.password
+      password: loginInfo.password,
     };
-  
+
     try {
-      debugger;
-      // lambda for login
-      await axios.post('https://c9vzd62jgh.execute-api.us-east-1.amazonaws.com/login/login', loginData, {
-        headers: { 'Content-Type': 'application/json' }
-      }).then((res) => {
-        console.log(res);
-        debugger;
-      });
-      console.log('Successfully logged in');
-      
-      setLoginInfo({
-        username: '',
-        password: '',
-      });
+      const response = await axios.post(
+        'https://c9vzd62jgh.execute-api.us-east-1.amazonaws.com/login/login',
+        loginData, // Send loginData directly as an object
+        {
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+      console.log(response.data);
     } catch (error) {
-      console.log('Error during login:', error);
+      console.error('Error during login:', error);
     }
-    console.log("Attempted login with:", loginData);
   };
 
   return (
