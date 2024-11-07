@@ -1,5 +1,12 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import AWS from 'aws-sdk';
+
+// AWS S3 configuration
+AWS.config.update({
+  region: 'us-east-1'
+});
+const s3 = new AWS.S3();
 
 export default function FetchItemsComponent() {
   const [items, setItems] = useState([]);
@@ -11,6 +18,7 @@ export default function FetchItemsComponent() {
     iStartingPrice: '',
     duration: ''
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [redraw, forceRedraw] = useState(0);
 
   const fetchItems = async () => {
@@ -34,19 +42,40 @@ export default function FetchItemsComponent() {
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const uploadImageToS3 = async (file) => {
+    const params = {
+      Bucket: 'uploadimage24',
+      Key: `uploads/${Date.now()}_${file.name}`,
+      Body: file,
+      ACL: 'public-read'
+    };
+
+    const { Location } = await s3.upload(params).promise();
+    return Location;
+  };
+
   const addItem = async () => {
-    const { iName, iDescription, iImage, iStartingPrice } = newItem;
-    if (!iName || !iDescription || !iImage || !iStartingPrice) {
+    const { iName, iDescription, iStartingPrice } = newItem;
+    if (!iName || !iDescription || !imageFile || !iStartingPrice) {
       alert('Please fill in all required fields: Item Name, Description, Image URL, and Starting Price.');
       return;
     }
 
     try {
-      await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', newItem, {
+
+      const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
+      const itemData = { ...newItem, iImage }; // Add image URL to item data
+
+      await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
       setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
+      setImageFile(null);
       fetchItems();
     } catch (error) {
       console.error('Failed to add item:', error.response || error.message);
@@ -176,8 +205,8 @@ export default function FetchItemsComponent() {
           <input name="iDescription" value={newItem.iDescription} onChange={handleInputChange} placeholder="Description" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label style={{ width: '150px', fontWeight: 'bold' }}>Image URL *</label>
-          <input name="iImage" value={newItem.iImage} onChange={handleInputChange} placeholder="Image URL" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Image *</label>
+          <input name="iImage" type="file" onChange={handleFileChange} accept="image/*" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Starting Price *</label>
@@ -215,7 +244,7 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage} alt={item.iName} width="100" /></td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage || null} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStartDate}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iEndDate}</td>
