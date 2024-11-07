@@ -220,7 +220,7 @@ export default function Accounts() {
         <input
           type="text"
           name="username"
-          value={loginInfo.username}
+          value={usernameInfo.username}
           onChange={handleCloseAccount}
           placeholder="Username"
         />
