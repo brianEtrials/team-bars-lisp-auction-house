@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 export default function FetchItemsComponent() {
   const [items, setItems] = useState([]);
+  const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
@@ -17,6 +18,7 @@ export default function FetchItemsComponent() {
       const response = await axios.get('https://6fcuh9wqla.execute-api.us-east-1.amazonaws.com/review-items');
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
       setItems(responseData.items || []);
+      setSellerInfo(responseData.sellerInfo || {});  // Set seller information
       forceRedraw(redraw + 1);
     } catch (error) {
       console.error('Failed to fetch items:', error);
@@ -92,6 +94,13 @@ export default function FetchItemsComponent() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      {/* Display seller information */}
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <h2>Seller Information</h2>
+        <p>Name: {sellerInfo.first_name} {sellerInfo.last_name}</p>
+        <p>Email: {sellerInfo.email}</p>
+      </div>
+      {/* Add item form and items table */}
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>ADD A NEW ITEM</h1>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '500px', margin: '0 auto', paddingBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
