@@ -8,7 +8,7 @@ export default function FetchItemsComponent() {
     iDescription: '',
     iImage: '',
     iStartingPrice: '',
-    iDuration: ''
+    duration: ''
   });
   const [redraw, forceRedraw] = useState(0);
 
@@ -44,7 +44,7 @@ export default function FetchItemsComponent() {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', iDuration: '' });
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
       fetchItems();
     } catch (error) {
       console.error('Failed to add item:', error.response || error.message);
@@ -83,7 +83,7 @@ export default function FetchItemsComponent() {
     }
   
     try {
-      await axios.post('https://k5scly63ii.execute-api.us-east-1.amazonaws.com/publish-item', { item_ID, durationValue }, {
+      await axios.post('https://k5scly63ii.execute-api.us-east-1.amazonaws.com/publish-item/publishItem', { item_ID, durationValue }, {
           headers: { 'Content-Type': 'application/json' },
         }
       );
@@ -98,7 +98,36 @@ export default function FetchItemsComponent() {
     }
   };
   
+  const unpublishItem = async (item_ID) => {
+    fetchItems();
+    const itemToUnpublish = items.find((item) => item.item_ID === item_ID);
 
+    if (itemToUnpublish.iStatus !== 'active') {
+      alert('Item is not active and cannot be unpublished.');
+      return;
+    }
+    
+    const numBids = Number(itemToUnpublish.iNumBids);
+    if (numBids > 0) {
+      alert('Item has bids and cannot be unpublished.');
+      return;
+    }
+    
+    try {
+      await axios.post( 'https://975qwer2kh.execute-api.us-east-1.amazonaws.com/unpublish-item/unpublish-item', { item_ID }, {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      alert('Item unpublished successfully!');
+      fetchItems();
+    } catch (error) {
+      console.error('Failed to unpublish item:', error.response || error.message);
+      alert(
+        'Failed to unpublish item: ' +
+          (error.response ? error.response.data.message : error.message)
+      );
+    }
+  };
 
   const selected_action = (itemId, action) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
@@ -109,7 +138,7 @@ export default function FetchItemsComponent() {
       publishItem(itemId);
     }
     else if (action == 'Unpublish'){
-
+      unpublishItem(itemId);
     }
     else if(action == 'Fulfill'){
     
@@ -147,7 +176,7 @@ export default function FetchItemsComponent() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Duration (days)</label>
-          <input name="iDuration" type="number" value={newItem.iDuration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
+          <input name="duration" type="number" value={newItem.duration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
         </div>
         <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px', marginTop: '10px' }}>
           Add Item
