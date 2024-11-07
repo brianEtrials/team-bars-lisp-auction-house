@@ -33,21 +33,21 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Iteration 1: Use Cases
 
-  Buyer/Seller Open Account
+  Buyer Create Account
+
+  Seller Create Account
   
-  Buyer/Seller Close Account
-  
-  Buyer/Seller Login Account
+  Buyer Close Account
+
+  Seller Close Account
   
   Buyer Add Funds
   
   Seller Add Item
 
   Seller Review Item
-  
-  Seller Edit Item 
 
-  Seller Remove Inactive Item
+  Seller Remove Item
   
   Seller Publish Item
   
