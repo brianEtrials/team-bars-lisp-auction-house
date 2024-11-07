@@ -1,8 +1,23 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
+// Antonela - 
+interface Item {
+  item_ID: number;
+  iName: string;
+  iDescription: string;
+  iImage: string;
+  iStartingPrice: number;
+  iStartDate?: number;
+  iEndDate?: number;
+  iStatus?: string;
+  duration?: number;
+  iNumBids?: number;
+}
+
+
 export default function FetchItemsComponent() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
@@ -28,7 +43,7 @@ export default function FetchItemsComponent() {
     fetchItems();
   }, []);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
 
@@ -46,28 +61,34 @@ export default function FetchItemsComponent() {
       alert('Item added successfully!');
       setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to add item:', error.response || error.message);
       alert('Failed to add item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
 
-  const deleteitem = async (item_ID) => {
+  const deleteitem = async (item_ID: number) => {
     try {
       await axios.post('https://ol1cazlhx6.execute-api.us-east-1.amazonaws.com/remove-item', { item_ID }, {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item deleted successfully!');
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete item:', error.response || error.message);
       alert('Failed to delete item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
 
-  const publishItem = async (item_ID) => {
+  const publishItem = async (item_ID: number) => {
 
     const itemToPublish = items.find((item) => item.item_ID === item_ID);
+
+    if (!itemToPublish) {
+      alert("Item not found");
+      return;
+    }
+
     const { duration, iStartingPrice } = itemToPublish;
     const durationValue = Number(duration);
     const startingPriceValue = Number(iStartingPrice);
@@ -89,7 +110,7 @@ export default function FetchItemsComponent() {
       );
       alert('Item published successfully!');
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to publish item:', error.response || error.message);
       alert(
         'Failed to publish item: ' +
@@ -98,9 +119,14 @@ export default function FetchItemsComponent() {
     }
   };
   
-  const unpublishItem = async (item_ID) => {
+  const unpublishItem = async (item_ID: number) => {
     fetchItems();
     const itemToUnpublish = items.find((item) => item.item_ID === item_ID);
+
+    if (!itemToUnpublish) {
+      alert("Item not found");
+      return;
+    }
 
     if (itemToUnpublish.iStatus !== 'active') {
       alert('Item is not active and cannot be unpublished.');
@@ -120,7 +146,7 @@ export default function FetchItemsComponent() {
       );
       alert('Item unpublished successfully!');
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to unpublish item:', error.response || error.message);
       alert(
         'Failed to unpublish item: ' +
@@ -129,7 +155,7 @@ export default function FetchItemsComponent() {
     }
   };
 
-  const selected_action = (itemId, action) => {
+  const selected_action = (itemId: number, action: string) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
       deleteitem(itemId);
@@ -216,8 +242,8 @@ export default function FetchItemsComponent() {
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus)}>Publish</option>
-                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus)}>Unpublish</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus ?? '')}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus ?? '')}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>

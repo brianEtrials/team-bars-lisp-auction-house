@@ -13,7 +13,7 @@ export default function Accounts() {
   });
 
   // Handle input changes
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setAccountInfo((prevInfo) => ({
       ...prevInfo,
@@ -22,7 +22,7 @@ export default function Accounts() {
   };
 
   // Handle form submission to create an account
-  const handleCreateAccount = async (e) => {
+  const handleCreateAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevents page from reloading after form submission
 
     // Preparing the request data

@@ -2,9 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+interface UserData {
+    first_name: string;
+    last_name: string;
+    email: string;
+    funds: number;
+  }
+  
+
 export default function BuyerAccountPage() {
-    const [getdata, setdata] = useState({});
-    const [inputValue, setInputValue] = useState('');
+    const [getdata, setdata] = useState<UserData | null>(null); // Initialize with `null`
+
+    // Sharvi look at this - inputValue type.
+    const [inputValue, setInputValue] = useState<string>('');
     const [redraw, forceRedraw] = React.useState(0)  
 
       // Function to fetch items from the API
@@ -18,7 +28,7 @@ export default function BuyerAccountPage() {
         console.log("API Response:", responseData);
         // setFunds(responseData.funds || []);
         setdata(responseData); // Set funds as the entire response data object
-    } catch (error) {
+    } catch (error: any) {
         if (error.response) {
             // Server responded with a status other than 2xx
             console.error("Response error:", error.response.status, error.response.data);
@@ -33,7 +43,7 @@ export default function BuyerAccountPage() {
             alert("Network error: " + error.message);
         }
         // setFunds([]);
-        setdata({});
+        setdata(null);
     }
     }
      // Fetch items when the component mounts
@@ -45,9 +55,9 @@ export default function BuyerAccountPage() {
     const andRefreshDisplay = () => {
         forceRedraw(redraw+1)
     }
-  
-  const handleInputChange = (e) => {
-    setInputValue({ ...inputValue, [e.target.name]: e.target.value });
+  //Sharvi
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setInputValue( e.target.value );
   };
 
 
@@ -62,7 +72,7 @@ export default function BuyerAccountPage() {
                 setInputValue('');
                 alert("Funds updated successfully!");
                 andRefreshDisplay()
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to update funds:", error);
                 alert("Failed to update funds. " + (error.response ? error.response.data : error.message));
             }
