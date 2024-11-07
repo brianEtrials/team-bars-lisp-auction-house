@@ -9,7 +9,7 @@ export default function FetchItemsComponent() {
     iDescription: '',
     iImage: '',
     iStartingPrice: '',
-    iDuration: ''
+    duration: ''
   });
   const [redraw, forceRedraw] = useState(0);
 
@@ -46,7 +46,7 @@ export default function FetchItemsComponent() {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', iDuration: '' });
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
       fetchItems();
     } catch (error) {
       console.error('Failed to add item:', error.response || error.message);
@@ -67,16 +67,80 @@ export default function FetchItemsComponent() {
     }
   };
 
+  const publishItem = async (item_ID) => {
+
+    const itemToPublish = items.find((item) => item.item_ID === item_ID);
+    const { duration, iStartingPrice } = itemToPublish;
+    const durationValue = Number(duration);
+    const startingPriceValue = Number(iStartingPrice);
+  
+    if (isNaN(durationValue) || durationValue < 1) {
+      alert('Duration must be a number equal to or greater than 1.');
+      return;
+    }
+  
+    if (isNaN(startingPriceValue) || startingPriceValue <= 0 || !Number.isInteger(startingPriceValue)) {
+      alert('Starting price must be a positive integer greater than 0.');
+      return;
+    }
+  
+    try {
+      await axios.post('https://k5scly63ii.execute-api.us-east-1.amazonaws.com/publish-item/publishItem', { item_ID, durationValue }, {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      alert('Item published successfully!');
+      fetchItems();
+    } catch (error) {
+      console.error('Failed to publish item:', error.response || error.message);
+      alert(
+        'Failed to publish item: ' +
+          (error.response ? error.response.data.message : error.message)
+      );
+    }
+  };
+  
+  const unpublishItem = async (item_ID) => {
+    fetchItems();
+    const itemToUnpublish = items.find((item) => item.item_ID === item_ID);
+
+    if (itemToUnpublish.iStatus !== 'active') {
+      alert('Item is not active and cannot be unpublished.');
+      return;
+    }
+    
+    const numBids = Number(itemToUnpublish.iNumBids);
+    if (numBids > 0) {
+      alert('Item has bids and cannot be unpublished.');
+      return;
+    }
+    
+    try {
+      await axios.post( 'https://975qwer2kh.execute-api.us-east-1.amazonaws.com/unpublish-item/unpublish-item', { item_ID }, {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      alert('Item unpublished successfully!');
+      fetchItems();
+    } catch (error) {
+      console.error('Failed to unpublish item:', error.response || error.message);
+      alert(
+        'Failed to unpublish item: ' +
+          (error.response ? error.response.data.message : error.message)
+      );
+    }
+  };
+
   const selected_action = (itemId, action) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
       deleteitem(itemId);
     } 
     else if (action == 'Publish'){
-
+      publishItem(itemId);
     }
     else if (action == 'Unpublish'){
-
+      unpublishItem(itemId);
     }
     else if(action == 'Fulfill'){
     
@@ -121,7 +185,7 @@ export default function FetchItemsComponent() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Duration (days)</label>
-          <input name="iDuration" type="number" value={newItem.iDuration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
+          <input name="duration" type="number" value={newItem.duration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
         </div>
         <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px', marginTop: '10px' }}>
           Add Item
@@ -161,8 +225,8 @@ export default function FetchItemsComponent() {
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish">Publish</option>
-                    <option disabled value="Unpublish">Unpublish</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus)}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus)}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>
