@@ -58,7 +58,7 @@ export default function Accounts() {
     debugger;
     try {
       const response = await axios.delete(
-        'https://c9vzd62jgh.execute-api.us-east-1.amazonaws.com/close/closeaccount',
+        'https://dyqqbfiore.execute-api.us-east-1.amazonaws.com/closeAccount/close',
          // Send loginData directly as an object
         {
           headers: { 'Content-Type': 'application/json' },
