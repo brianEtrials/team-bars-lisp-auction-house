@@ -3,7 +3,12 @@ import React, { useEffect, useState } from 'react';
 import AWS from 'aws-sdk';
 
 // Add your AWS S3 configuration security key
-
+AWS.config.update({
+  accessKeyId: '',
+  secretAccessKey: '',
+  region: 'us-east-1'
+});
+const s3 = new AWS.S3();
 interface Item {
   item_ID: number;
   iName: string;
