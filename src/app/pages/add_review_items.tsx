@@ -1,14 +1,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import AWS from 'aws-sdk';
+// import AWS from 'aws-sdk';
 
-// Add your AWS S3 configuration security key
-AWS.config.update({
-  accessKeyId: '',
-  secretAccessKey: '',
-  region: 'us-east-1'
-});
-const s3 = new AWS.S3();
+
+
+// const s3 = new AWS.S3();
 interface Item {
   item_ID: number;
   iName: string;
@@ -90,7 +86,7 @@ export default function FetchItemsComponent() {
       ACL: 'public-read'
     };
 
-    const { Location } = await s3.upload(params).promise();
+    // const { Location } = await s3.upload(params).promise();
     return Location;
   };
 
