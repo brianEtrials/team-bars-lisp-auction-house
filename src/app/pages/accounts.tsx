@@ -1,8 +1,12 @@
 'use client'
 import axios from 'axios';
 import React, { useState } from 'react';
+import secureLocalStorage from "react-secure-storage";
+import { useNavigate } from "react-router-dom";
 
 export default function Accounts() {
+  // to navigation from one page to another 
+  const navigate = useNavigate();
   // account state
   const [accountInfo, setAccountInfo] = useState({
     firstName: '',
@@ -26,7 +30,7 @@ export default function Accounts() {
   });
 
   // input changes for create account
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setAccountInfo((prevInfo) => ({
       ...prevInfo,
@@ -35,7 +39,7 @@ export default function Accounts() {
   };
 
   // input changes for login
-  const handleLoginInputChange = (e) => {
+  const handleLoginInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginInfo((prevInfo) => ({
       ...prevInfo,
@@ -44,7 +48,7 @@ export default function Accounts() {
   };
 
   // input for close account
-  const handleCloseAccount = (e) => {
+  const handleCloseAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setCloseAccountInfo((prevInfo) => ({
       ...prevInfo,
@@ -53,7 +57,7 @@ export default function Accounts() {
   };
 
   // Handle form submission for close account
-  const closeAccount = async (e) => {
+  const closeAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     debugger;
     try {
@@ -72,7 +76,7 @@ export default function Accounts() {
   };
 
   // Handle form submission to create an account
-  const handleCreateAccount = async (e) => {
+  const handleCreateAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevents page from reloading after form submission
 
     // Preparing the request data
@@ -92,24 +96,47 @@ export default function Accounts() {
         headers: { 'Content-Type': 'application/json' }
       });
       console.log('Successful creation of account');
-      // reset fields
-      setAccountInfo({
-        firstName: '',
-        lastName: '',
-        email: '',
-        funds: '',
-        accountType: 'buyer',
-        username: '',
-        password: '',
+
+      // Store account info securely in localStorage after account creation
+      secureLocalStorage.setItem("userCredentials", {
+        username: accountInfo.username,
+        accountType: accountInfo.accountType
       });
+
+      // Pass account info as state to the BuyerAccountPage
+      const storedCredentials = secureLocalStorage.getItem("userCredentials");
+
+      if (accountInfo.accountType === "buyer") {
+        navigate("/buyerAccountPage", { state: storedCredentials }); // Pass state here
+      } else if (accountInfo.accountType === "seller") {
+        navigate("/add_review_items"); // Navigate to seller account page
+      } else {
+        alert("Please select a user type before creating an account.");
+      }
+
     } catch (error) {
-      console.log('Error when creating account:', error);
+      console.log('Error creating account:', error);
     }
-    console.log("Account created with:", accountData);
   };
+  
+      // // reset fields
+      // setAccountInfo({
+      //   firstName: '',
+      //   lastName: '',
+      //   email: '',
+      //   funds: '',
+      //   accountType: 'buyer',
+      //   username: '',
+      //   password: '',
+      // });
+    // } catch (error) {
+    //   console.log('Error when creating account:', error);
+    // }
+    // console.log("Account created with:", accountData);
+ 
 
   // Handle form submission to log in
-  const loginAccount = async (e) => {
+  const loginAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
     // initial login data
@@ -186,14 +213,6 @@ export default function Accounts() {
           onChange={handleInputChange}
           placeholder="Funds"
         />
-        <select
-          name="accountType"
-          value={accountInfo.accountType}
-          onChange={handleInputChange}
-        >
-          <option value="buyer">Buyer</option>
-          <option value="seller">Seller</option>
-        </select>
         <input
           type="text"
           name="username"
@@ -208,6 +227,15 @@ export default function Accounts() {
           onChange={handleInputChange}
           placeholder="Password"
         />
+        <select
+          name="accountType"
+          value={accountInfo.accountType}
+          onChange={handleInputChange}
+        >
+          <option value="buyer">Buyer</option>
+          <option value="seller">Seller</option>
+        </select>
+
         <button type="submit">Create Account</button>
       </form>
 

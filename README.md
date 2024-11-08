@@ -21,6 +21,10 @@ To properly install everything, do the following:
 
 ```bash
 npm install
+npm install react@18 react-dom@18
+npm install react-router-dom
+npm install aws-sdk
+npm install react-secure-storage
 ```
 
 Then to launch, type:
