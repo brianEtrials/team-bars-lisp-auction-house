@@ -2,12 +2,6 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import AWS from 'aws-sdk';
 
-// AWS S3 configuration
-AWS.config.update({
-  region: 'us-east-1'
-});
-const s3 = new AWS.S3();
-
 export default function FetchItemsComponent() {
   const [items, setItems] = useState([]);
   const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
@@ -46,18 +40,6 @@ export default function FetchItemsComponent() {
     setImageFile(e.target.files[0]);
   };
 
-  const uploadImageToS3 = async (file) => {
-    const params = {
-      Bucket: 'uploadimage24',
-      Key: `uploads/${Date.now()}_${file.name}`,
-      Body: file,
-      ACL: 'public-read'
-    };
-
-    const { Location } = await s3.upload(params).promise();
-    return Location;
-  };
-
   const addItem = async () => {
     const { iName, iDescription, iStartingPrice } = newItem;
     if (!iName || !iDescription || !imageFile || !iStartingPrice) {
@@ -67,9 +49,22 @@ export default function FetchItemsComponent() {
 
     try {
 
-      const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
+      // Convert image file to base64 string
+      const base64Image = await toBase64(imageFile);
+      
+      // Call the Lambda function for image upload
+      const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image', {
+        base64Image, // Pass the base64-encoded image to Lambda
+      });
+
+      // Extract image URL from Lambda response
+      const iImage = lambdaResponse.data?.imageUrl;
+      if (!iImage) throw new Error("Image upload failed");
+
+      // Add the item with image URL to the item data
       const itemData = { ...newItem, iImage }; // Add image URL to item data
 
+       // Post item data to add-item endpoint
       await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
         headers: { 'Content-Type': 'application/json' }
       });
@@ -82,6 +77,15 @@ export default function FetchItemsComponent() {
       alert('Failed to add item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
+
+  // Utility function to convert image file to base64
+  const toBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve((reader.result as string).split(',')[1]);
+      reader.onerror = (error) => reject(error);
+    });
 
   const deleteitem = async (item_ID) => {
     try {

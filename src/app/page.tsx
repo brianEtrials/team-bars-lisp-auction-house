@@ -12,7 +12,6 @@ export default function Page() {
         style={{ width: '50px', height: 'auto' }}
       />
       <FetchItemsComponent />
-      <BuyerAccountPage/>
     </div>
   );
 }
