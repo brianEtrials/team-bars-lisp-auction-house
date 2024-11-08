@@ -2,19 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-interface UserData {
-    first_name: string;
-    last_name: string;
-    email: string;
-    funds: number;
-  }
-  
+interface BuyerData {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    funds?: string;
+}
 
 export default function BuyerAccountPage() {
-    const [getdata, setdata] = useState<UserData | null>(null); // Initialize with `null`
-
-    // Sharvi look at this - inputValue type.
-    const [inputValue, setInputValue] = useState<string>('');
+    const [getdata, setdata] = useState<BuyerData>({});
+    const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
 
       // Function to fetch items from the API
@@ -43,7 +40,7 @@ export default function BuyerAccountPage() {
             alert("Network error: " + error.message);
         }
         // setFunds([]);
-        setdata(null);
+        setdata({});
     }
     }
      // Fetch items when the component mounts
@@ -55,9 +52,9 @@ export default function BuyerAccountPage() {
     const andRefreshDisplay = () => {
         forceRedraw(redraw+1)
     }
-  //Sharvi
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setInputValue( e.target.value );
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value );
   };
 
 
@@ -67,6 +64,7 @@ export default function BuyerAccountPage() {
         if (!isNaN(amountToAdd)) {
             try {
                 // Send only the amount to add, not the calculated total
+                console.log("input data", inputValue)
                 const response = await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', { funds: amountToAdd });
                 fetchFunds();  // Update with the new total funds returned by the Lambda function
                 setInputValue('');
@@ -91,7 +89,7 @@ export default function BuyerAccountPage() {
                     <input 
                         type="number" 
                         value={inputValue} 
-                        onChange={(e) => setInputValue(e.target.value)} 
+                        onChange={handleInputChange} 
                         placeholder="Enter amount"
                     />
                     <button 
@@ -106,6 +104,3 @@ export default function BuyerAccountPage() {
         </main>
     );
 }
-
-
-

@@ -1,23 +1,26 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import AWS from 'aws-sdk';
 
-// Antonela - 
+// AWS S3 configuration
+
+
 interface Item {
   item_ID: number;
   iName: string;
   iDescription: string;
-  iImage: string;
+  iImage: File;
   iStartingPrice: number;
-  iStartDate?: number;
-  iEndDate?: number;
+  iStartDate?: string;
+  iEndDate?: string;
   iStatus?: string;
   duration?: number;
   iNumBids?: number;
 }
 
-
 export default function FetchItemsComponent() {
   const [items, setItems] = useState<Item[]>([]);
+  const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
@@ -25,6 +28,8 @@ export default function FetchItemsComponent() {
     iStartingPrice: '',
     duration: ''
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageURLs, setImageURLs] = useState<{ [key: number]: string }>({}); // State for storing object URLs
   const [redraw, forceRedraw] = useState(0);
 
   const fetchItems = async () => {
@@ -32,6 +37,7 @@ export default function FetchItemsComponent() {
       const response = await axios.get('https://6fcuh9wqla.execute-api.us-east-1.amazonaws.com/review-items');
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
       setItems(responseData.items || []);
+      setSellerInfo(responseData.sellerInfo || {});  // Set seller information
       forceRedraw(redraw + 1);
     } catch (error) {
       console.error('Failed to fetch items:', error);
@@ -43,23 +49,65 @@ export default function FetchItemsComponent() {
     fetchItems();
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  useEffect(() => {
+    // Create object URLs for items with File type images
+    const newImageURLs: { [key: number]: string } = {};
+
+    items.forEach(item => {
+      if (item.iImage instanceof File) {
+        newImageURLs[item.item_ID] = URL.createObjectURL(item.iImage);
+      }
+    });
+    setImageURLs(newImageURLs); // Update state with new URLs
+
+    // Cleanup: Revoke object URLs when items change or component unmounts
+    return () => {
+      Object.values(newImageURLs).forEach(url => URL.revokeObjectURL(url));
+    };
+  }, [items]);
+
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setImageFile(e.target.files[0]);
+    }
+  };
+  
+
+  const uploadImageToS3 = async (file: File) => {
+    const params = {
+      Bucket: 'uploadimage24',
+      Key: `uploads/${Date.now()}_${file.name}`,
+      Body: file,
+      ACL: 'public-read'
+    };
+
+    const { Location } = await s3.upload(params).promise();
+    return Location;
+  };
+
   const addItem = async () => {
-    const { iName, iDescription, iImage, iStartingPrice } = newItem;
-    if (!iName || !iDescription || !iImage || !iStartingPrice) {
+    const { iName, iDescription, iStartingPrice } = newItem;
+    if (!iName || !iDescription || !imageFile || !iStartingPrice) {
       alert('Please fill in all required fields: Item Name, Description, Image URL, and Starting Price.');
       return;
     }
 
     try {
-      await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', newItem, {
+
+      const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
+      const itemData = { ...newItem, iImage }; // Add image URL to item data
+
+      await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
       setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
+      setImageFile(null);
       fetchItems();
     } catch (error: any) {
       console.error('Failed to add item:', error.response || error.message);
@@ -82,10 +130,10 @@ export default function FetchItemsComponent() {
 
   const publishItem = async (item_ID: number) => {
 
-    const itemToPublish = items.find((item) => item.item_ID === item_ID);
+    const itemToPublish = items.find((item) => item.item_ID === item_ID)as Item | undefined;
 
     if (!itemToPublish) {
-      alert("Item not found");
+      alert('Item not found');
       return;
     }
 
@@ -121,10 +169,10 @@ export default function FetchItemsComponent() {
   
   const unpublishItem = async (item_ID: number) => {
     fetchItems();
-    const itemToUnpublish = items.find((item) => item.item_ID === item_ID);
+    const itemToUnpublish = items.find((item) => item.item_ID === item_ID) as Item | undefined;
 
     if (!itemToUnpublish) {
-      alert("Item not found");
+      alert('Item not found');
       return;
     }
 
@@ -160,19 +208,22 @@ export default function FetchItemsComponent() {
     if (action === 'Remove') {
       deleteitem(itemId);
     } 
-    else if (action == 'Publish'){
+    else if (action === 'Publish'){
       publishItem(itemId);
     }
-    else if (action == 'Unpublish'){
+    else if (action === 'Unpublish'){
       unpublishItem(itemId);
     }
-    else if(action == 'Fulfill'){
+    else if(action === 'Fulfill'){
     
      }
-     else if(action == 'Remove'){
+     else if(action === 'Remove'){
 
     }
-    else if(action == 'Remove'){
+    else if(action === 'Archive'){
+
+    }
+    else if(action === 'Unfreeze'){
 
     }
     else{
@@ -182,6 +233,13 @@ export default function FetchItemsComponent() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      {/* Display seller information */}
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <h2>Seller Information</h2>
+        <p>Name: {sellerInfo.first_name} {sellerInfo.last_name}</p>
+        <p>Email: {sellerInfo.email}</p>
+      </div>
+      {/* Add item form and items table */}
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>ADD A NEW ITEM</h1>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '500px', margin: '0 auto', paddingBottom: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -193,8 +251,8 @@ export default function FetchItemsComponent() {
           <input name="iDescription" value={newItem.iDescription} onChange={handleInputChange} placeholder="Description" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <label style={{ width: '150px', fontWeight: 'bold' }}>Image URL *</label>
-          <input name="iImage" value={newItem.iImage} onChange={handleInputChange} placeholder="Image URL" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Image *</label>
+          <input name="iImage" type="file" onChange={handleFileChange} accept="image/*" style={{ flex: 1, padding: '8px', fontSize: '16px' }} required />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Starting Price *</label>
@@ -232,18 +290,18 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage} alt={item.iName} width="100" /></td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage instanceof File ? URL.createObjectURL(item.iImage) : item.iImage} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStartDate}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iEndDate}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStartDate || ''} </td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iEndDate || ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus ?? '')}>Publish</option>
-                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus ?? '')}>Unpublish</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus || '')}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus || '')}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>
