@@ -1,18 +1,18 @@
-'use client'
+'use client';
+import FetchItemsComponent from './pages/add_review_items';
+import Accounts from './pages/accounts';
+import BuyerAccountPage from './pages/buyerAccountPage';
 import React from 'react';
-import FetchItemsComponent from './add_review_items';
-import BuyerAccountPage from './buyerAccountPage';
+import { Route, Routes } from "react-router-dom";
 
 export default function Page() {
   return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
-      <img 
-        src="https://raw.githubusercontent.com/brianEtrials/team-bars-lisp-auction-house/d8cd3cc21d5bbe1940b592642c33f3242bf75fb4/img/logo.png" 
-        alt="Auction House Logo" 
-        style={{ width: '50px', height: 'auto' }}
-      />
-      <FetchItemsComponent />
-      <BuyerAccountPage/>
-    </div>
+    <div>
+      <Routes>
+        <Route path="/" element={<Accounts />} />
+        <Route path="/buyerAccountPage" element={<BuyerAccountPage />} />
+        <Route path="/add_review_items" element={<FetchItemsComponent/>} />
+      </Routes>
+      </div>
   );
 }

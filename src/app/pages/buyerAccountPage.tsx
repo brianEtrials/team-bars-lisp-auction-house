@@ -1,54 +1,52 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import axios from 'axios';
 
+interface BuyerData {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    funds?: string;
+}
+
 export default function BuyerAccountPage() {
-    const [getdata, setdata] = useState({});
+    // routing purpose
+    const location = useLocation();
+    const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
+    const usernamedata = location.state.username as string;
 
       // Function to fetch items from the API
     const fetchFunds = async () => {
     try {
-        const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile');
-        // setFunds(response.data.funds);
-        
+        console.log("Fetching username : ",usernamedata)
+        const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile', {
+            params: { username: usernamedata }, // Explicitly send username as query parameter
+          });
+    
         const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
-        // Access the items array and set it in the state
-        console.log("API Response:", responseData);
-        // setFunds(responseData.funds || []);
-        setdata(responseData); // Set funds as the entire response data object
+        setdata(responseData);
     } catch (error) {
-        if (error.response) {
-            // Server responded with a status other than 2xx
-            console.error("Response error:", error.response.status, error.response.data);
-            alert(`Failed to fetch funds: ${error.response.data.message || error.response.statusText}`);
-        } else if (error.request) {
-            // Request was made but no response received
-            console.error("Request error:", error.request);
-            alert("No response received from server. Check network and API configuration.");
-        } else {
-            // Something happened in setting up the request
-            console.error("Network error:", error.message);
-            alert("Network error: " + error.message);
-        }
-        // setFunds([]);
+        console.error("Request error:", error);
+        alert("Failed to fetch funds");
         setdata({});
-    }
-    }
+     }
+    };
      // Fetch items when the component mounts
-  useEffect(() => {
-    fetchFunds();
-  }, []);
+    useEffect(() => {
+        fetchFunds();
+    }, []);
 
     // utility method (that can be passed around) for refreshing display in React
     const andRefreshDisplay = () => {
         forceRedraw(redraw+1)
     }
   
-  const handleInputChange = (e) => {
-    setInputValue({ ...inputValue, [e.target.name]: e.target.value });
-  };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value );
+    };
 
 
 // updates the funds
@@ -56,13 +54,17 @@ export default function BuyerAccountPage() {
         const amountToAdd = parseFloat(inputValue);
         if (!isNaN(amountToAdd)) {
             try {
-                // Send only the amount to add, not the calculated total
-                const response = await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', { funds: amountToAdd });
+              if (typeof usernamedata !== 'string' || !usernamedata.trim()) {
+                throw new Error("Invalid email provided");
+                }
+                console.log("fetching the email: ", usernamedata)
+                await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', { 
+                    usernamedata,funds: amountToAdd });
                 fetchFunds();  // Update with the new total funds returned by the Lambda function
                 setInputValue('');
                 alert("Funds updated successfully!");
                 andRefreshDisplay()
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to update funds:", error);
                 alert("Failed to update funds. " + (error.response ? error.response.data : error.message));
             }
@@ -81,7 +83,7 @@ export default function BuyerAccountPage() {
                     <input 
                         type="number" 
                         value={inputValue} 
-                        onChange={(e) => setInputValue(e.target.value)} 
+                        onChange={handleInputChange} 
                         placeholder="Enter amount"
                     />
                     <button 
@@ -96,6 +98,3 @@ export default function BuyerAccountPage() {
         </main>
     );
 }
-
-
-
