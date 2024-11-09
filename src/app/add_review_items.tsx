@@ -1,8 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import AWS from 'aws-sdk';
 
-// AWS S3 configuration
+
 
 
 interface Item {
@@ -78,17 +77,7 @@ export default function FetchItemsComponent() {
   };
   
 
-  const uploadImageToS3 = async (file: File) => {
-    const params = {
-      Bucket: 'uploadimage24',
-      Key: `uploads/${Date.now()}_${file.name}`,
-      Body: file,
-      ACL: 'public-read'
-    };
 
-    const { Location } = await s3.upload(params).promise();
-    return Location;
-  };
 
   const addItem = async () => {
     const { iName, iDescription, iStartingPrice } = newItem;
@@ -99,7 +88,7 @@ export default function FetchItemsComponent() {
 
     try {
 
-      const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
+      //const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
       const itemData = { ...newItem, iImage }; // Add image URL to item data
 
       await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
