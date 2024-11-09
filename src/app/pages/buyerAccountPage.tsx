@@ -11,8 +11,6 @@ interface BuyerData {
 }
 
 export default function BuyerAccountPage() {
-    // routing purpose
-    const location = useLocation();
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
@@ -27,10 +25,25 @@ export default function BuyerAccountPage() {
           });
     
         const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
-        setdata(responseData);
-    } catch (error) {
-        console.error("Request error:", error);
-        alert("Failed to fetch funds");
+        // Access the items array and set it in the state
+        console.log("API Response:", responseData);
+        // setFunds(responseData.funds || []);
+        setdata(responseData); // Set funds as the entire response data object
+    } catch (error: any) {
+        if (error.response) {
+            // Server responded with a status other than 2xx
+            console.error("Response error:", error.response.status, error.response.data);
+            alert(`Failed to fetch funds: ${error.response.data.message || error.response.statusText}`);
+        } else if (error.request) {
+            // Request was made but no response received
+            console.error("Request error:", error.request);
+            alert("No response received from server. Check network and API configuration.");
+        } else {
+            // Something happened in setting up the request
+            console.error("Network error:", error.message);
+            alert("Network error: " + error.message);
+        }
+        // setFunds([]);
         setdata({});
      }
     };
@@ -44,9 +57,9 @@ export default function BuyerAccountPage() {
         forceRedraw(redraw+1)
     }
   
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value );
-    };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value );
+  };
 
 
 // updates the funds
@@ -54,12 +67,9 @@ export default function BuyerAccountPage() {
         const amountToAdd = parseFloat(inputValue);
         if (!isNaN(amountToAdd)) {
             try {
-              if (typeof usernamedata !== 'string' || !usernamedata.trim()) {
-                throw new Error("Invalid email provided");
-                }
-                console.log("fetching the email: ", usernamedata)
-                await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', { 
-                    usernamedata,funds: amountToAdd });
+                // Send only the amount to add, not the calculated total
+                console.log("input data", inputValue)
+                const response = await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', { funds: amountToAdd });
                 fetchFunds();  // Update with the new total funds returned by the Lambda function
                 setInputValue('');
                 alert("Funds updated successfully!");

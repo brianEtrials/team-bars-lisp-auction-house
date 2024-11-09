@@ -18,6 +18,22 @@ interface Item {
   iNumBids?: number;
 }
 
+
+
+
+interface Item {
+  item_ID: number;
+  iName: string;
+  iDescription: string;
+  iImage: File;
+  iStartingPrice: number;
+  iStartDate?: string;
+  iEndDate?: string;
+  iStatus?: string;
+  duration?: number;
+  iNumBids?: number;
+}
+
 export default function FetchItemsComponent() {
   const [items, setItems] = useState<Item[]>([]);
   const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
@@ -78,17 +94,6 @@ export default function FetchItemsComponent() {
   };
   
 
-  const uploadImageToS3 = async (file: File) => {
-    const params = {
-      Bucket: 'uploadimage24',
-      Key: `uploads/${Date.now()}_${file.name}`,
-      Body: file,
-      ACL: 'public-read'
-    };
-
-    // const { Location } = await s3.upload(params).promise();
-    return Location;
-  };
 
   const addItem = async () => {
     const { iName, iDescription, iStartingPrice } = newItem;
@@ -99,7 +104,7 @@ export default function FetchItemsComponent() {
 
     try {
 
-      const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
+      //const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
       const itemData = { ...newItem, iImage }; // Add image URL to item data
 
       await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
