@@ -1,24 +1,35 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import axios from 'axios';
 
+interface BuyerData {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    funds?: string;
+}
+
 export default function BuyerAccountPage() {
-    const [getdata, setdata] = useState({});
+    const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
+    const usernamedata = location.state.username as string;
 
       // Function to fetch items from the API
     const fetchFunds = async () => {
     try {
-        const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile');
-        // setFunds(response.data.funds);
-        
+        console.log("Fetching username : ",usernamedata)
+        const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile', {
+            params: { username: usernamedata }, // Explicitly send username as query parameter
+          });
+    
         const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
         // Access the items array and set it in the state
         console.log("API Response:", responseData);
         // setFunds(responseData.funds || []);
         setdata(responseData); // Set funds as the entire response data object
-    } catch (error) {
+    } catch (error: any) {
         if (error.response) {
             // Server responded with a status other than 2xx
             console.error("Response error:", error.response.status, error.response.data);
@@ -34,20 +45,20 @@ export default function BuyerAccountPage() {
         }
         // setFunds([]);
         setdata({});
-    }
-    }
+     }
+    };
      // Fetch items when the component mounts
-  useEffect(() => {
-    fetchFunds();
-  }, []);
+    useEffect(() => {
+        fetchFunds();
+    }, []);
 
     // utility method (that can be passed around) for refreshing display in React
     const andRefreshDisplay = () => {
         forceRedraw(redraw+1)
     }
   
-  const handleInputChange = (e) => {
-    setInputValue({ ...inputValue, [e.target.name]: e.target.value });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value );
   };
 
 
@@ -57,12 +68,13 @@ export default function BuyerAccountPage() {
         if (!isNaN(amountToAdd)) {
             try {
                 // Send only the amount to add, not the calculated total
+                console.log("input data", inputValue)
                 const response = await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', { funds: amountToAdd });
                 fetchFunds();  // Update with the new total funds returned by the Lambda function
                 setInputValue('');
                 alert("Funds updated successfully!");
                 andRefreshDisplay()
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to update funds:", error);
                 alert("Failed to update funds. " + (error.response ? error.response.data : error.message));
             }
@@ -81,7 +93,7 @@ export default function BuyerAccountPage() {
                     <input 
                         type="number" 
                         value={inputValue} 
-                        onChange={(e) => setInputValue(e.target.value)} 
+                        onChange={handleInputChange} 
                         placeholder="Enter amount"
                     />
                     <button 
@@ -96,6 +108,3 @@ export default function BuyerAccountPage() {
         </main>
     );
 }
-
-
-

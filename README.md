@@ -21,6 +21,9 @@ To properly install everything, do the following:
 
 ```bash
 npm install
+npm install react@18 react-dom@18
+npm install react-router-dom
+npm install react-secure-storage
 ```
 
 Then to launch, type:
@@ -33,26 +36,29 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Iteration 1: Use Cases
 
-  Buyer Create Account
-
-  Seller Create Account
+  Buyer:
   
-  Buyer Close Account
+    -Create Account
 
-  Seller Close Account
-  
-  Buyer Add Funds
-  
-  Seller Add Item
+    -Login to Account
 
-  Seller Review Item
+    -Add Funds
 
-  Seller Remove Item
+  Seller:
   
-  Seller Publish Item
-  
-  Seller Unpublish Item 
+    -Create Account
 
+    -Login to Account
+
+    -Add Item
+
+    -Review Items
+
+    -Remove Item
+
+    -Publish Item
+
+    -Unpublish Item
   
 
 #### Landing Pages for Use Cases Iteration 1:

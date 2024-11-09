@@ -1,23 +1,59 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useLocation } from "react-router-dom";
+
+
+interface Item {
+  item_ID: number;
+  iName: string;
+  iDescription: string;
+  iImage: File;
+  iStartingPrice: number;
+  iStartDate?: string;
+  iEndDate?: string;
+  iStatus?: string;
+  duration?: number;
+  iNumBids?: number;
+}
+
+
+
+
+interface Item {
+  item_ID: number;
+  iName: string;
+  iDescription: string;
+  iImage: File;
+  iStartingPrice: number;
+  iStartDate?: string;
+  iEndDate?: string;
+  iStatus?: string;
+  duration?: number;
+  iNumBids?: number;
+}
 
 export default function FetchItemsComponent() {
-  const [items, setItems] = useState([]);
+      // routing purpose
+  const location = useLocation();
+  const [items, setItems] = useState<Item[]>([]);
   const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
     iImage: '',
     iStartingPrice: '',
-    duration: ''
+    duration: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [redraw, forceRedraw] = useState(0);
+  const usernamedata = location.state.username as string;
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get('https://6fcuh9wqla.execute-api.us-east-1.amazonaws.com/review-items');
+      const response = await axios.get('https://dkgwfpcoeb.execute-api.us-east-1.amazonaws.com/itemreview/review',
+        { params: { username: usernamedata }});
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
+      console.log(responseData)
       setItems(responseData.items || []);
       setSellerInfo(responseData.sellerInfo || {});  // Set seller information
       forceRedraw(redraw + 1);
@@ -31,88 +67,86 @@ export default function FetchItemsComponent() {
     fetchItems();
   }, []);
 
-  const handleInputChange = (e) => {
+
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
 
-  const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setImageFile(e.target.files[0]);
+    }
   };
+  
+
 
   const addItem = async () => {
-    const { iName, iDescription, iStartingPrice } = newItem;
+    const { iName, iDescription, iStartingPrice} = newItem;
+    console.log("User name data ",usernamedata)
     if (!iName || !iDescription || !imageFile || !iStartingPrice) {
       alert('Please fill in all required fields: Item Name, Description, Image URL, and Starting Price.');
       return;
     }
 
     try {
+//--------------------------------------------Add s3 image code here----------------------------------
 
-      // Convert image file to base64 string
-      const base64Image = await toBase64(imageFile);
-      console.log("Base64 Image Data:", base64Image);
-      
-      // Call the Lambda function for image upload
-      const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
-        { base64Image },
-        {
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
-
-      // Parse the response body if it's still in string format
-      const responseData = typeof lambdaResponse.data.body === 'string' 
-      ? JSON.parse(lambdaResponse.data.body)
-      : lambdaResponse.data;
-
-      console.log('Lambda response:', lambdaResponse); 
-
-      // Extract image URL from Lambda response
-      const iImage = responseData.imageUrl;
-      if (!iImage) throw new Error("Image upload failed");
-
-      // Add the item with image URL to the item data
+<<<<<<< Updated upstream
+      //const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
       const itemData = { ...newItem, iImage }; // Add image URL to item data
+=======
+>>>>>>> Stashed changes
 
-       // Post item data to add-item endpoint
-      await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
+
+
+//--------------------------------------------Add s3 image code here----------------------------------
+
+      //Post item data to add-item endpoint
+      await axios.post('https://rk6fe66yz1.execute-api.us-east-1.amazonaws.com/add-item', itemData, {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: ''});
       setImageFile(null);
       fetchItems();
-    } catch (error) {
-      console.error('Failed to add item:', error);
+    } catch (error: any) {
+      console.error('Failed to add item:', error.response || error.message);
       alert('Failed to add item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
 
-  // Utility function to convert image file to base64
-  const toBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve((reader.result as string).split(',')[1]);
-      reader.onerror = (error) => reject(error);
-    });
+//--------------------------------------------Add s3 image code here----------------------------------
 
-  const deleteitem = async (item_ID) => {
+
+
+
+
+//--------------------------------------------Add s3 image code here----------------------------------
+
+
+  const deleteitem = async (item_ID: number) => {
     try {
       await axios.post('https://ol1cazlhx6.execute-api.us-east-1.amazonaws.com/remove-item', { item_ID }, {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item deleted successfully!');
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete item:', error.response || error.message);
       alert('Failed to delete item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
 
-  const publishItem = async (item_ID) => {
+  const publishItem = async (item_ID: number) => {
 
-    const itemToPublish = items.find((item) => item.item_ID === item_ID);
+    const itemToPublish = items.find((item) => item.item_ID === item_ID)as Item | undefined;
+
+    if (!itemToPublish) {
+      alert('Item not found');
+      return;
+    }
+
     const { duration, iStartingPrice } = itemToPublish;
     const durationValue = Number(duration);
     const startingPriceValue = Number(iStartingPrice);
@@ -134,7 +168,7 @@ export default function FetchItemsComponent() {
       );
       alert('Item published successfully!');
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to publish item:', error.response || error.message);
       alert(
         'Failed to publish item: ' +
@@ -143,9 +177,14 @@ export default function FetchItemsComponent() {
     }
   };
   
-  const unpublishItem = async (item_ID) => {
+  const unpublishItem = async (item_ID: number) => {
     fetchItems();
-    const itemToUnpublish = items.find((item) => item.item_ID === item_ID);
+    const itemToUnpublish = items.find((item) => item.item_ID === item_ID) as Item | undefined;
+
+    if (!itemToUnpublish) {
+      alert('Item not found');
+      return;
+    }
 
     if (itemToUnpublish.iStatus !== 'active') {
       alert('Item is not active and cannot be unpublished.');
@@ -165,7 +204,7 @@ export default function FetchItemsComponent() {
       );
       alert('Item unpublished successfully!');
       fetchItems();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to unpublish item:', error.response || error.message);
       alert(
         'Failed to unpublish item: ' +
@@ -174,24 +213,27 @@ export default function FetchItemsComponent() {
     }
   };
 
-  const selected_action = (itemId, action) => {
+  const selected_action = (itemId: number, action: string) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
       deleteitem(itemId);
     } 
-    else if (action == 'Publish'){
+    else if (action === 'Publish'){
       publishItem(itemId);
     }
-    else if (action == 'Unpublish'){
+    else if (action === 'Unpublish'){
       unpublishItem(itemId);
     }
-    else if(action == 'Fulfill'){
+    else if(action === 'Fulfill'){
     
      }
-     else if(action == 'Remove'){
+     else if(action === 'Remove'){
 
     }
-    else if(action == 'Remove'){
+    else if(action === 'Archive'){
+
+    }
+    else if(action === 'Unfreeze'){
 
     }
     else{
@@ -258,18 +300,18 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage || null} alt={item.iName} width="100" /></td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage instanceof File ? URL.createObjectURL(item.iImage) : item.iImage} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus !== 'inactive' ? item.iStartDate : ''}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus !== 'inactive' ? item.iEndDate : ''}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStartDate || ''} </td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iEndDate || ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus)}>Publish</option>
-                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus)}>Unpublish</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus || '')}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus || '')}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>
