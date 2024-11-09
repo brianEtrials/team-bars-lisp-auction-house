@@ -14,9 +14,11 @@ export default function BuyerAccountPage() {
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
-    const usernamedata = location.state.username as string;
+    const location = useLocation();
+    const storedCredentials = location.state;
+    const usernamedata = storedCredentials?.username;
 
-      // Function to fetch items from the API
+    // Function to fetch items from the API
     const fetchFunds = async () => {
     try {
         console.log("Fetching username : ",usernamedata)

@@ -59,7 +59,6 @@ export default function Accounts() {
   // Handle form submission for close account
   const closeAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    debugger;
     try {
       const response = await axios.delete(
         'https://dyqqbfiore.execute-api.us-east-1.amazonaws.com/closeAccount/close',
