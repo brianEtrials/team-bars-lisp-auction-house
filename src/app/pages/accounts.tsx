@@ -108,7 +108,7 @@ export default function Accounts() {
       if (accountInfo.accountType === "buyer") {
         navigate("/buyerAccountPage", { state: storedCredentials }); // Pass state here
       } else if (accountInfo.accountType === "seller") {
-        navigate("/add_review_items"); // Navigate to seller account page
+        navigate("/add_review_items", { state: storedCredentials }); // Navigate to seller account page
       } else {
         alert("Please select a user type before creating an account.");
       }

@@ -1,5 +1,5 @@
 'use client';
-import FetchItemsComponent from './pages/add_review_items';
+import FetchItemsComponent from './pages/seller';
 import Accounts from './pages/accounts';
 import BuyerAccountPage from './pages/buyerAccountPage';
 import React from 'react';

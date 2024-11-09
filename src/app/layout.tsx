@@ -28,7 +28,8 @@ export default function RootLayout({
       >
         <BrowserRouter>
         {/* Wrap only specific components in BrowserRouter if needed */}
-          {children} {/* Ensure your routing hooks are within BrowserRouter */}
+          {children} 
+        {/* Ensure your routing hooks are within BrowserRouter */}
           </BrowserRouter>
       </body>
     </html>
