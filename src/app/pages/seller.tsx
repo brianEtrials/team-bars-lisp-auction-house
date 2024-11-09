@@ -92,12 +92,31 @@ export default function FetchItemsComponent() {
     try {
 //--------------------------------------------Add s3 image code here----------------------------------
 
-<<<<<<< Updated upstream
-      //const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
-      const itemData = { ...newItem, iImage }; // Add image URL to item data
-=======
->>>>>>> Stashed changes
+const base64Image = await toBase64(imageFile);
+      console.log("Base64 Image Data:", base64Image);
 
+      // Call the Lambda function for image upload
+      const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+        { base64Image },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      // Parse the response body if it's still in string format
+      const responseData = typeof lambdaResponse.data.body === 'string' 
+      ? JSON.parse(lambdaResponse.data.body) 
+      : lambdaResponse.data;
+
+      console.log('Lambda response:', lambdaResponse); 
+
+      // Extract image URL from Lambda response
+      const iImage = responseData.imageUrl;
+      if (!iImage) throw new Error("Image upload failed");
+
+      // Add the item with image URL to the item data
+        const itemData = { ...newItem, iImage, username: usernamedata };
+      console.log("these are all items details",itemData)
 
 
 //--------------------------------------------Add s3 image code here----------------------------------
@@ -118,8 +137,14 @@ export default function FetchItemsComponent() {
 
 //--------------------------------------------Add s3 image code here----------------------------------
 
-
-
+// Utility function to convert image file to base64
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+    reader.onerror = (error) => reject(error);
+  });
 
 
 //--------------------------------------------Add s3 image code here----------------------------------
@@ -302,8 +327,8 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage instanceof File ? URL.createObjectURL(item.iImage) : item.iImage} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStartDate || ''} </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iEndDate || ''} </td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iStartDate : ''} </td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iEndDate : ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
