@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
+import { useLocation } from "react-router-dom";
 import axios from 'axios';
 
 interface BuyerData {
@@ -13,13 +14,16 @@ export default function BuyerAccountPage() {
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
+    const usernamedata = location.state.username as string;
 
       // Function to fetch items from the API
     const fetchFunds = async () => {
     try {
-        const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile');
-        // setFunds(response.data.funds);
-        
+        console.log("Fetching username : ",usernamedata)
+        const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile', {
+            params: { username: usernamedata }, // Explicitly send username as query parameter
+          });
+    
         const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
         // Access the items array and set it in the state
         console.log("API Response:", responseData);
@@ -41,12 +45,12 @@ export default function BuyerAccountPage() {
         }
         // setFunds([]);
         setdata({});
-    }
-    }
+     }
+    };
      // Fetch items when the component mounts
-  useEffect(() => {
-    fetchFunds();
-  }, []);
+    useEffect(() => {
+        fetchFunds();
+    }, []);
 
     // utility method (that can be passed around) for refreshing display in React
     const andRefreshDisplay = () => {

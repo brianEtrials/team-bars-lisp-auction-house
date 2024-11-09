@@ -1,5 +1,22 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+// import AWS from 'aws-sdk';
+
+
+
+// const s3 = new AWS.S3();
+interface Item {
+  item_ID: number;
+  iName: string;
+  iDescription: string;
+  iImage: File;
+  iStartingPrice: number;
+  iStartDate?: string;
+  iEndDate?: string;
+  iStatus?: string;
+  duration?: number;
+  iNumBids?: number;
+}
 
 
 
@@ -76,7 +93,6 @@ export default function FetchItemsComponent() {
     }
   };
   
-
 
 
   const addItem = async () => {
