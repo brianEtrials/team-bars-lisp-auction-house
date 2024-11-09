@@ -59,7 +59,6 @@ export default function Accounts() {
   // Handle form submission for close account
   const closeAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    debugger;
     try {
       const response = await axios.delete(
         'https://dyqqbfiore.execute-api.us-east-1.amazonaws.com/closeAccount/close',
@@ -118,44 +117,45 @@ export default function Accounts() {
       console.log('Error creating account:', error);
     }
   };
-  
-      // // reset fields
-      // setAccountInfo({
-      //   firstName: '',
-      //   lastName: '',
-      //   email: '',
-      //   funds: '',
-      //   accountType: 'buyer',
-      //   username: '',
-      //   password: '',
-      // });
-    // } catch (error) {
-    //   console.log('Error when creating account:', error);
-    // }
-    // console.log("Account created with:", accountData);
- 
 
   // Handle form submission to log in
   const loginAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   
-    // initial login data
+    // Initial login data
     const loginData = {
       username: loginInfo.username,
       password: loginInfo.password,
     };
-
+  
     try {
       const response = await axios.post(
         'https://c9vzd62jgh.execute-api.us-east-1.amazonaws.com/login/login',
-        loginData, // Send loginData directly as an object
+        loginData,
         {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-      console.log(response.data);
+  
+      // Lambda returns response as JSON string - might want to change
+      const accountInfo = typeof response.data.body === "string" ? JSON.parse(response.data.body) : response.data.body;
+
+      secureLocalStorage.setItem("userCredentials", {
+        username: accountInfo.username,
+        account_type: accountInfo.account_type,
+      });
+  
+      if (accountInfo.account_type === "buyer") {
+        navigate("/buyerAccountPage", { state: accountInfo });
+      } else if (accountInfo.account_type === "seller") {
+        navigate("/add_review_items", { state: accountInfo });
+      } else {
+        alert("Account type is not recognized.");
+      }
+  
     } catch (error) {
       console.error('Error during login:', error);
+      alert("Login failed. Please check your credentials and try again.");
     }
   };
 
