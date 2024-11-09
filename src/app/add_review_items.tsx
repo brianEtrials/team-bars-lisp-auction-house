@@ -1,6 +1,5 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import AWS from 'aws-sdk';
 
 export default function FetchItemsComponent() {
   const [items, setItems] = useState([]);
@@ -51,14 +50,25 @@ export default function FetchItemsComponent() {
 
       // Convert image file to base64 string
       const base64Image = await toBase64(imageFile);
+      console.log("Base64 Image Data:", base64Image);
       
       // Call the Lambda function for image upload
-      const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image', {
-        base64Image, // Pass the base64-encoded image to Lambda
-      });
+      const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+        { base64Image },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      // Parse the response body if it's still in string format
+      const responseData = typeof lambdaResponse.data.body === 'string' 
+      ? JSON.parse(lambdaResponse.data.body)
+      : lambdaResponse.data;
+
+      console.log('Lambda response:', lambdaResponse); 
 
       // Extract image URL from Lambda response
-      const iImage = lambdaResponse.data?.imageUrl;
+      const iImage = responseData.imageUrl;
       if (!iImage) throw new Error("Image upload failed");
 
       // Add the item with image URL to the item data
@@ -73,7 +83,7 @@ export default function FetchItemsComponent() {
       setImageFile(null);
       fetchItems();
     } catch (error) {
-      console.error('Failed to add item:', error.response || error.message);
+      console.error('Failed to add item:', error);
       alert('Failed to add item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
@@ -250,8 +260,8 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage || null} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStartDate}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iEndDate}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus !== 'inactive' ? item.iStartDate : ''}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus !== 'inactive' ? item.iEndDate : ''}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
