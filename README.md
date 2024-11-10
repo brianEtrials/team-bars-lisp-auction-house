@@ -61,11 +61,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     -Unpublish Item
   
 
-#### Landing Pages for Use Cases Iteration 1:
+#### Landing Page for Use Cases Iteration 1: http://auctionlisp.s3-website-us-east-1.amazonaws.com
 
-### Notes:
+### Info for use cases testing:
 
-- When adding a new item, its status is 'inactive' by default. Seller is able to enter Name, Description, Image, Price, of the product. Once published, Start Date is set to current day, and End Date will be calculated from duration + Start Date.
-- Item ID will be automatically created in incremental order by the database.
-- (include pic of the database with items added)
-- In the frontend, the user submits the Start Date and End Date in the form of date and it will converted into to seconds on the API, which is then stored in the form of int in the database.
+- Credentials for login buyer: username:testbuyer, password:test.
+- Credentials for login seller: username:testseller, password:test.
+- Create Account with any credentials (suggestions: First name: test, Last name: user, email: testuser@test.com, username: testuser, password: test).
+- Item Name should always be unique.
