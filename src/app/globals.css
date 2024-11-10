@@ -72,3 +72,89 @@ button.Add {
 button.Add:hover {
   background-color: #0056b3; /* Darken button on hover */
 }
+
+
+
+/* General container styles */
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Form styles */
+form {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Input field styles */
+input, select {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: #007BFF;
+}
+
+/* Button styles */
+button {
+  padding: 12px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Separator line */
+p {
+  font-size: 16px;
+  color: #777;
+  margin: 20px 0;
+}
+
+/* Heading styles */
+h1 {
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Styling for the forms individually */
+form:first-of-type {
+  margin-top: 0;
+}
+
+form:nth-of-type(2) {
+  margin-top: 30px;
+}
+
+form:last-of-type {
+  margin-top: 40px;
+}
