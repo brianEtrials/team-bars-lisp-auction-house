@@ -11,7 +11,7 @@
 
 ## Getting Started
 
-Clone the repository with: `git clone https://github.com/yourusername/auction-house.git`. You’ll be on the main branch by default.
+Clone the repository with: `[git clone https://github.com/yourusername/auction-house.git](https://github.com/brianEtrials/team-bars-lisp-auction-house.git)`. You’ll be on the main branch by default.
 
 ## Installing modules for `main`
 
@@ -65,5 +65,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Credentials for login buyer: username:testbuyer, password:test.
 - Credentials for login seller: username:testseller, password:test.
-- Create Account with any credentials (suggestions: First name: test, Last name: user, email: testuser@test.com, username: testuser, password: test).
+- Create Account with any credentials.
 - Item Name should always be unique.
+- Select either to create account or login on the landing page.
