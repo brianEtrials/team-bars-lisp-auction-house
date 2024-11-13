@@ -1,10 +1,24 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-// import AWS from 'aws-sdk';
+import { useLocation } from "react-router-dom";
+
+
+interface Item {
+  item_ID: number;
+  iName: string;
+  iDescription: string;
+  iImage: File;
+  iStartingPrice: number;
+  iStartDate?: string;
+  iEndDate?: string;
+  iStatus?: string;
+  duration?: number;
+  iNumBids?: number;
+}
 
 
 
-// const s3 = new AWS.S3();
+
 interface Item {
   item_ID: number;
   iName: string;
@@ -19,6 +33,8 @@ interface Item {
 }
 
 export default function FetchItemsComponent() {
+      // routing purpose
+  const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
   const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
   const [newItem, setNewItem] = useState({
@@ -26,16 +42,18 @@ export default function FetchItemsComponent() {
     iDescription: '',
     iImage: '',
     iStartingPrice: '',
-    duration: ''
+    duration: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageURLs, setImageURLs] = useState<{ [key: number]: string }>({}); // State for storing object URLs
   const [redraw, forceRedraw] = useState(0);
+  const usernamedata = location.state.username as string;
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get('https://6fcuh9wqla.execute-api.us-east-1.amazonaws.com/review-items');
+      const response = await axios.get('https://dkgwfpcoeb.execute-api.us-east-1.amazonaws.com/itemreview/review',
+        { params: { username: usernamedata }});
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
+      console.log(responseData)
       setItems(responseData.items || []);
       setSellerInfo(responseData.sellerInfo || {});  // Set seller information
       forceRedraw(redraw + 1);
@@ -49,24 +67,8 @@ export default function FetchItemsComponent() {
     fetchItems();
   }, []);
 
-  useEffect(() => {
-    // Create object URLs for items with File type images
-    const newImageURLs: { [key: number]: string } = {};
 
-    items.forEach(item => {
-      if (item.iImage instanceof File) {
-        newImageURLs[item.item_ID] = URL.createObjectURL(item.iImage);
-      }
-    });
-    setImageURLs(newImageURLs); // Update state with new URLs
 
-    // Cleanup: Revoke object URLs when items change or component unmounts
-    return () => {
-      Object.values(newImageURLs).forEach(url => URL.revokeObjectURL(url));
-    };
-  }, [items]);
-
-  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
@@ -78,35 +80,53 @@ export default function FetchItemsComponent() {
   };
   
 
-  const uploadImageToS3 = async (file: File) => {
-    const params = {
-      Bucket: 'uploadimage24',
-      Key: `uploads/${Date.now()}_${file.name}`,
-      Body: file,
-      ACL: 'public-read'
-    };
-
-    // const { Location } = await s3.upload(params).promise();
-    return Location;
-  };
 
   const addItem = async () => {
-    const { iName, iDescription, iStartingPrice } = newItem;
+    const { iName, iDescription, iStartingPrice} = newItem;
+    console.log("User name data ",usernamedata)
     if (!iName || !iDescription || !imageFile || !iStartingPrice) {
       alert('Please fill in all required fields: Item Name, Description, Image URL, and Starting Price.');
       return;
     }
 
     try {
+//--------------------------------------------Add s3 image code here----------------------------------
 
-      const iImage = await uploadImageToS3(imageFile); // Upload image to S3 and get URL
-      const itemData = { ...newItem, iImage }; // Add image URL to item data
+const base64Image = await toBase64(imageFile);
+      console.log("Base64 Image Data:", base64Image);
 
-      await axios.post('https://ulxzavbwoi.execute-api.us-east-1.amazonaws.com/add-item/add-item', itemData, {
+      // Call the Lambda function for image upload
+      const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+        { base64Image },
+        {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      // Parse the response body if it's still in string format
+      const responseData = typeof lambdaResponse.data.body === 'string' 
+      ? JSON.parse(lambdaResponse.data.body) 
+      : lambdaResponse.data;
+
+      console.log('Lambda response:', lambdaResponse); 
+
+      // Extract image URL from Lambda response
+      const iImage = responseData.imageUrl;
+      if (!iImage) throw new Error("Image upload failed");
+
+      // Add the item with image URL to the item data
+        const itemData = { ...newItem, iImage, username: usernamedata };
+      console.log("these are all items details",itemData)
+
+
+//--------------------------------------------Add s3 image code here----------------------------------
+
+      //Post item data to add-item endpoint
+      await axios.post('https://rk6fe66yz1.execute-api.us-east-1.amazonaws.com/add-item', itemData, {
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '' });
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: ''});
       setImageFile(null);
       fetchItems();
     } catch (error: any) {
@@ -114,6 +134,21 @@ export default function FetchItemsComponent() {
       alert('Failed to add item: ' + (error.response ? error.response.data.message : error.message));
     }
   };
+
+//--------------------------------------------Add s3 image code here----------------------------------
+
+// Utility function to convert image file to base64
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve((reader.result as string).split(',')[1]);
+    reader.onerror = (error) => reject(error);
+  });
+
+
+//--------------------------------------------Add s3 image code here----------------------------------
+
 
   const deleteitem = async (item_ID: number) => {
     try {
@@ -292,8 +327,8 @@ export default function FetchItemsComponent() {
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage instanceof File ? URL.createObjectURL(item.iImage) : item.iImage} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStartDate || ''} </td>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iEndDate || ''} </td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iStartDate : ''} </td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iEndDate : ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>

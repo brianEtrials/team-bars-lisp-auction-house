@@ -2,7 +2,7 @@
 
 import localFont from "next/font/local";
 import "./globals.css";
-import { BrowserRouter } from "react-router-dom";
+// import { BrowserRouter } from "react-router-dom";
 
 
 const geistSans = localFont({
@@ -26,10 +26,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <BrowserRouter>
+        {/* <BrowserRouter> */}
         {/* Wrap only specific components in BrowserRouter if needed */}
-          {children} {/* Ensure your routing hooks are within BrowserRouter */}
-          </BrowserRouter>
+          {children} 
+        {/* Ensure your routing hooks are within BrowserRouter */}
+          {/* </BrowserRouter> */}
       </body>
     </html>
   );
