@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
+import CloseAccount from './closeaccounts';
 
 
 interface Item {
@@ -36,7 +37,7 @@ export default function FetchItemsComponent() {
       // routing purpose
   const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
-  const [sellerInfo, setSellerInfo] = useState({ first_name: '', last_name: '', email: '' });  // State for seller information
+  const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '' });  // State for seller information
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
@@ -47,6 +48,7 @@ export default function FetchItemsComponent() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [redraw, forceRedraw] = useState(0);
   const usernamedata = location.state.username as string;
+  const accountInfo = location.state;
 
   const fetchItems = async () => {
     try {
@@ -351,6 +353,7 @@ const toBase64 = (file: File): Promise<string> =>
       ) : (
         <p style={{ textAlign: 'center' }}>No items available for review.</p>
       )}
+      <CloseAccount id={accountInfo.idaccounts}/>
     </div>
   );
 }

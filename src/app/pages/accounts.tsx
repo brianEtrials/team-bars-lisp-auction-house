@@ -24,11 +24,6 @@ export default function Accounts() {
     password: ''
   });
 
-  // close account state
-  const [usernameInfo, setCloseAccountInfo] = useState({
-    username: '',
-  });
-
   // input changes for create account
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -45,33 +40,6 @@ export default function Accounts() {
       ...prevInfo,
       [name]: value
     }));
-  };
-
-  // input for close account
-  const handleCloseAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCloseAccountInfo((prevInfo) => ({
-      ...prevInfo,
-      [name]: value
-    }));
-  };
-
-  // Handle form submission for close account
-  const closeAccount = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await axios.delete(
-        'https://dyqqbfiore.execute-api.us-east-1.amazonaws.com/closeAccount/close',
-         // Send loginData directly as an object
-        {
-          headers: { 'Content-Type': 'application/json' },
-          data: {username: usernameInfo.username},
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error during close account:', error);
-    }
   };
 
   // Handle form submission to create an account
@@ -144,7 +112,6 @@ export default function Accounts() {
         username: accountInfo.username,
         account_type: accountInfo.account_type,
       });
-  
       if (accountInfo.account_type === "buyer") {
         navigate("/buyerAccountPage", { state: accountInfo });
       } else if (accountInfo.account_type === "seller") {
@@ -241,22 +208,6 @@ export default function Accounts() {
 
         <button type="submit">Create Account</button>
       </form>
-
-      {/* <p>-----------------------------------------------------------------</p> */}
-
-       {/* Close Account */}
-       {/* Future implementation - account should only be closed by either admin or owner of account */}
-       {/* Login */}
-      {/* <form onSubmit={closeAccount}>
-        <input
-          type="text"
-          name="username"
-          value={usernameInfo.username}
-          onChange={handleCloseAccount}
-          placeholder="Username"
-        />
-        <button type="submit">Close Account</button>
-      </form> */}
     </div>
     </div>
   );

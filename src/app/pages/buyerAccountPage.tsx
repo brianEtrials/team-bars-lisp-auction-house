@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from "react-router-dom";
 import axios from 'axios';
+import CloseAccount from './closeaccounts';
 
 interface BuyerData {
+    id?: number;
     first_name?: string;
     last_name?: string;
     email?: string;
@@ -17,6 +19,7 @@ export default function BuyerAccountPage() {
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
     const usernamedata = location.state.username as string;
+    const accountInfo = location.state;
 
       // Function to fetch items from the API
     const fetchFunds = async () => {
@@ -95,6 +98,7 @@ export default function BuyerAccountPage() {
                     </button>
                 </div>
             </div>
+            <CloseAccount id={accountInfo.idaccounts}/>
         </main>
     );
 }
