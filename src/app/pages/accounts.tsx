@@ -57,15 +57,19 @@ export default function Accounts() {
       password: accountInfo.password
     };
 
+    let accountId = null;
     try {
       // lambda for creating account
       await axios.post('https://56jlr8kgak.execute-api.us-east-1.amazonaws.com/initial/create-account', accountData, {
         headers: { 'Content-Type': 'application/json' }
+      }).then((response) => {
+        const infoAfterCreateAccount = typeof response.data.body === "string" ? JSON.parse(response.data.body) : response.data.body;
+        accountId = infoAfterCreateAccount.accountId;
       });
       console.log('Successful creation of account');
-
       // Store account info securely in localStorage after account creation
       secureLocalStorage.setItem("userCredentials", {
+        id: accountId,
         username: accountInfo.username,
         accountType: accountInfo.accountType
       });
@@ -104,7 +108,6 @@ export default function Accounts() {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-  
       // Lambda returns response as JSON string - might want to change
       const accountInfo = typeof response.data.body === "string" ? JSON.parse(response.data.body) : response.data.body;
 
