@@ -25,7 +25,7 @@ body {
 }
 
 
-.button{
+.signin{
   font: bold 11px Arial;
   text-decoration: none;
   background-color: #EEEEEE;
@@ -74,9 +74,8 @@ button.Add:hover {
 }
 
 
-
 /* General container styles */
-div {
+div.account {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -117,7 +116,7 @@ button {
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 16px;
+  font-size: 1100px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
@@ -129,6 +128,10 @@ button:hover {
 button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+#signin{
+  margin-left: 12px;
 }
 
 /* Separator line */

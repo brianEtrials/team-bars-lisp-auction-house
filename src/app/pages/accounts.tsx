@@ -160,7 +160,7 @@ export default function Accounts() {
   };
 
   return (
-    <div>
+    <div className = 'account'>
       {/* Login */}
       <div className="flex flex-col items-center space-y-4" id="design">
         <h2>Login In</h2>
@@ -179,7 +179,7 @@ export default function Accounts() {
           onChange={handleLoginInputChange}
           placeholder="Password"
         />
-        <button type="submit">Login</button>
+        <button className ='Login' type="submit">Login</button>
       </form>
 
       {/* <p>-----------------------------------------------------------------</p> */}
@@ -239,7 +239,7 @@ export default function Accounts() {
           <option value="seller">Seller</option>
         </select>
 
-        <button type="submit">Create Account</button>
+        <button id ="createAccount" type="submit">Create Account</button>
       </form>
 
       {/* <p>-----------------------------------------------------------------</p> */}
