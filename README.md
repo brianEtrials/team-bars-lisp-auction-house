@@ -63,8 +63,9 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Info for use cases testing:
 
-- Credentials for login buyer: username:testbuyer, password:test.
-- Credentials for login seller: username:testseller, password:test.
+- Credentials for login buyer: username:testbuyer, password:test
+- Credentials for login seller: username:testseller, password:test
+- Credentials for login admin: username:admin, password:admin24
 - Create Account with any credentials.
 - Item Name should always be unique.
 - Select either to create account or login on the landing page.
