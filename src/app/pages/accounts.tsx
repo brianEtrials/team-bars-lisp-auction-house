@@ -15,18 +15,14 @@ export default function Accounts() {
     funds: '',
     accountType: 'buyer',
     username: '',
-    password: ''
+    password: '',
+    status: true
   });
 
   // login state
   const [loginInfo, setLoginInfo] = useState({
     username: '',
     password: ''
-  });
-
-  // close account state
-  const [usernameInfo, setCloseAccountInfo] = useState({
-    username: '',
   });
 
   // input changes for create account
@@ -47,33 +43,6 @@ export default function Accounts() {
     }));
   };
 
-  // input for close account
-  const handleCloseAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setCloseAccountInfo((prevInfo) => ({
-      ...prevInfo,
-      [name]: value
-    }));
-  };
-
-  // Handle form submission for close account
-  const closeAccount = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await axios.delete(
-        'https://dyqqbfiore.execute-api.us-east-1.amazonaws.com/closeAccount/close',
-         // Send loginData directly as an object
-        {
-          headers: { 'Content-Type': 'application/json' },
-          data: {username: usernameInfo.username},
-        }
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error('Error during close account:', error);
-    }
-  };
-
   // Handle form submission to create an account
   const handleCreateAccount = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevents page from reloading after form submission
@@ -86,18 +55,22 @@ export default function Accounts() {
       funds: parseFloat(accountInfo.funds) || 0.0, // Converts funds to a number
       accountType: accountInfo.accountType,
       username: accountInfo.username,
-      password: accountInfo.password
+      password: accountInfo.password,
+      status: accountInfo.status
     };
-
+    let accountId = null;
     try {
       // lambda for creating account
       await axios.post('https://56jlr8kgak.execute-api.us-east-1.amazonaws.com/initial/create-account', accountData, {
         headers: { 'Content-Type': 'application/json' }
+      }).then((response) => {
+        const infoAfterCreateAccount = typeof response.data.body === "string" ? JSON.parse(response.data.body) : response.data.body;
+        accountId = infoAfterCreateAccount.accountId;
       });
       console.log('Successful creation of account');
-
       // Store account info securely in localStorage after account creation
       secureLocalStorage.setItem("userCredentials", {
+        id: accountId,
         username: accountInfo.username,
         accountType: accountInfo.accountType
       });
@@ -136,7 +109,6 @@ export default function Accounts() {
           headers: { 'Content-Type': 'application/json' }
         }
       );
-  
       // Lambda returns response as JSON string - might want to change
       const accountInfo = typeof response.data.body === "string" ? JSON.parse(response.data.body) : response.data.body;
 
@@ -144,10 +116,12 @@ export default function Accounts() {
         username: accountInfo.username,
         account_type: accountInfo.account_type,
       });
-  
-      if (accountInfo.account_type === "buyer") {
+      let status = accountInfo.status; 
+      if(status === 0){
+        alert("Account is closed");
+      } else if (status === 1 && accountInfo.account_type === "buyer") {
         navigate("/buyerAccountPage", { state: accountInfo });
-      } else if (accountInfo.account_type === "seller") {
+      } else if (status === 1 && accountInfo.account_type === "seller") {
         navigate("/add_review_items", { state: accountInfo });
       } else {
         alert("Account type is not recognized.");
@@ -241,22 +215,6 @@ export default function Accounts() {
 
         <button id ="createAccount" type="submit">Create Account</button>
       </form>
-
-      {/* <p>-----------------------------------------------------------------</p> */}
-
-       {/* Close Account */}
-       {/* Future implementation - account should only be closed by either admin or owner of account */}
-       {/* Login */}
-      {/* <form onSubmit={closeAccount}>
-        <input
-          type="text"
-          name="username"
-          value={usernameInfo.username}
-          onChange={handleCloseAccount}
-          placeholder="Username"
-        />
-        <button type="submit">Close Account</button>
-      </form> */}
     </div>
 
     <div className="admin-login-container">
