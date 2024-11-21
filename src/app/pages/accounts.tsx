@@ -25,6 +25,8 @@ export default function Accounts() {
     password: ''
   });
 
+
+
   // input changes for create account
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -138,7 +140,7 @@ export default function Accounts() {
       {/* Login */}
       <div className="flex flex-col items-center space-y-4" id="design">
         <h2>Login In</h2>
-      <form onSubmit={loginAccount}>
+      <form className="Account" onSubmit={loginAccount}>
         <input
           type="text"
           name="username"
@@ -160,7 +162,7 @@ export default function Accounts() {
 
       {/* Create Account */}
       <h2>Create Account</h2>
-      <form onSubmit={handleCreateAccount}>
+      <form  className="Account" onSubmit={handleCreateAccount}>
         <input
           type="text"
           name="firstName"

@@ -57,7 +57,7 @@ export default function AdminLogin() {
   return (
     <div className="account">
       <h2>Admin Login</h2>
-      <form onSubmit={handleAdminLogin}>
+      <form className="admin" onSubmit={handleAdminLogin}>
         <input
           type="text"
           name="username"
