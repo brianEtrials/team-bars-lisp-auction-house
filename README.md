@@ -92,7 +92,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     -Unfreeze Item
     
 
-#### Landing Page for Use Cases Iteration 1: http://auctionlisp.s3-website-us-east-1.amazonaws.com
+#### Landing Page: http://auctionlisp.s3-website-us-east-1.amazonaws.com
 
 ### Info for use cases testing:
 
