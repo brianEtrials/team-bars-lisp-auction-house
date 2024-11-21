@@ -258,6 +258,16 @@ export default function Accounts() {
         <button type="submit">Close Account</button>
       </form> */}
     </div>
+
+    <div className="admin-login-container">
+      <button
+        onClick={() => navigate('/adminLogin')}
+        className="admin-login-button"
+      >
+        Admin Login
+      </button>
+    </div>
+
     </div>
   );
 }
