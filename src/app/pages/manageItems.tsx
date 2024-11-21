@@ -98,20 +98,20 @@ export default function ManageItems() {
                     style={{
                       margin: '0 5px',
                       padding: '5px 10px',
-                      backgroundColor: item.iStatus === 'frozen' || item.iStatus === 'active' ? '#333' : '#ccc',
+                      backgroundColor: ['frozen', 'pending', 'active'].includes(item.iStatus) ? '#333' : '#ccc',
                       color: 'white',
                       border: 'none',
                       borderRadius: '5px',
-                      cursor: item.iStatus === 'active' || item.iStatus === 'frozen' ? 'pointer' : 'not-allowed',
+                      cursor: ['active', 'frozen', 'pending'].includes(item.iStatus) ? 'pointer' : 'not-allowed',
                     }}
                     onClick={(e) => {
                       e.preventDefault();
                       if (item.iStatus === 'active') handleAction(item.item_ID, 'Freeze');
-                      else if (item.iStatus === 'frozen') handleAction(item.item_ID, 'Unfreeze');
+                      else if (['frozen', 'pending'].includes(item.iStatus)) handleAction(item.item_ID, 'Unfreeze');
                     }}
-                    disabled={item.iStatus !== 'active' && item.iStatus !== 'frozen'}
+                    disabled={!['active', 'frozen', 'pending'].includes(item.iStatus)}
                   >
-                    {item.iStatus === 'frozen' ? 'Unfreeze' : 'Freeze'}
+                    {item.iStatus === 'frozen' || item.iStatus === 'pending' ? 'Unfreeze' : 'Freeze'}
                   </button>
                 </td>
               </tr>
