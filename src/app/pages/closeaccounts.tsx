@@ -13,7 +13,6 @@ const CloseAccount: React.FC<UserId> = ({ id }) => {
     const accountInfo = location.state;
     const navigate = useNavigate();
     const handleCloseAccount = async (e: React.MouseEvent<HTMLButtonElement>) => {
-
     let idToPass = null;
     if(id == undefined){
       idToPass = accountInfo.id;
@@ -23,11 +22,11 @@ const CloseAccount: React.FC<UserId> = ({ id }) => {
     }
     e.preventDefault(); // Prevent the default button action
     try {
-      const response = await axios.delete(
+      const response = await axios.post(
         "https://dyqqbfiore.execute-api.us-east-1.amazonaws.com/closeAccount/close",
+        { idaccounts: idToPass },
         {
           headers: { "Content-Type": "application/json" },
-          data: { idaccounts: idToPass },
         }
       );
       console.log(response.data);

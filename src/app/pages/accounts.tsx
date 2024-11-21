@@ -15,7 +15,8 @@ export default function Accounts() {
     funds: '',
     accountType: 'buyer',
     username: '',
-    password: ''
+    password: '',
+    status: true
   });
 
   // login state
@@ -54,9 +55,9 @@ export default function Accounts() {
       funds: parseFloat(accountInfo.funds) || 0.0, // Converts funds to a number
       accountType: accountInfo.accountType,
       username: accountInfo.username,
-      password: accountInfo.password
+      password: accountInfo.password,
+      status: accountInfo.status
     };
-
     let accountId = null;
     try {
       // lambda for creating account
@@ -115,9 +116,12 @@ export default function Accounts() {
         username: accountInfo.username,
         account_type: accountInfo.account_type,
       });
-      if (accountInfo.account_type === "buyer") {
+      let status = accountInfo.status; 
+      if(status === 0){
+        alert("Account is closed");
+      } else if (status === 1 && accountInfo.account_type === "buyer") {
         navigate("/buyerAccountPage", { state: accountInfo });
-      } else if (accountInfo.account_type === "seller") {
+      } else if (status === 1 && accountInfo.account_type === "seller") {
         navigate("/add_review_items", { state: accountInfo });
       } else {
         alert("Account type is not recognized.");
