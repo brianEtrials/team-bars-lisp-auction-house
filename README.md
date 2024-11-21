@@ -22,6 +22,7 @@ npm install
 npm install react@18 react-dom@18
 npm install react-router-dom
 npm install react-secure-storage
+npm install bootstrap
 ```
 
 Then to launch, type:
@@ -32,7 +33,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the Auction House interface.
 
-### Iteration 1: Use Cases
+### Iteration 1: Use Cases (10)
 
   Buyer:
   
@@ -57,7 +58,39 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     -Publish Item
 
     -Unpublish Item
+
+### Iteration 2: Use Cases (11)
+
+  Buyer:
   
+    -Close Account
+
+    -Place Bid
+
+    -Review Active Bids
+
+  Seller:
+  
+    -Close Account
+    
+    -Request Unfreeze Item
+    
+    -Edit Item
+
+  Customer:
+  
+    -Search/Filter Items
+
+    -Sort Items
+
+    -View Item
+
+  Admin:
+  
+    -Freeze Item
+
+    -Unfreeze Item
+    
 
 #### Landing Page for Use Cases Iteration 1: http://auctionlisp.s3-website-us-east-1.amazonaws.com
 
@@ -66,6 +99,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Credentials for login buyer: username:testbuyer, password:test
 - Credentials for login seller: username:testseller, password:test
 - Credentials for login admin: username:admin, password:admin24
-- Create Account with any credentials.
 - Item Name should always be unique.
-- Select either to create account or login on the landing page.
