@@ -84,7 +84,18 @@ div.account {
 }
 
 /* Form styles */
-form {
+form.Account {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+form.admin {
   display: flex;
   flex-direction: column;
   width: 300px;

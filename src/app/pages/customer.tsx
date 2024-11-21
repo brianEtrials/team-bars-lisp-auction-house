@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from "react-router-dom";
-import secureLocalStorage from "react-secure-storage";
+import Container from "react-bootstrap/Container";
+import Form from "react-bootstrap/Form"
+import InputGroup from "react-bootstrap/InputGroup"; 
+import Button from "react-bootstrap/Button"
 
 interface Item {
   item_ID: number;
@@ -16,7 +19,13 @@ interface Item {
 
 export default function CustomerPage() {
   const [items, setItems] = useState<Item[]>([]);
+  const [search,setSearch] = useState('')
+  console.log("search bar ",search)
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Track sort order
+  const [startDateSortOrder, setStartDateSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [endDateSortOrder, setEndDateSortOrder] = useState<'asc' | 'desc'>('asc');
   const navigate = useNavigate();
+
   const fetchItemData = async () => {
     try {
       const response = await axios.get(
@@ -51,7 +60,7 @@ export default function CustomerPage() {
 
   }
 
-  const itemdetail =(selecteditems)=>{
+  const itemdetail =(selecteditems:Item)=>{
     // Store account info securely in localStorage after account creation
     console.log("item detail stage inside the customer page check: ",selecteditems)
     navigate("/ItemDetail",{state:{ ...selecteditems}})
@@ -67,13 +76,68 @@ export default function CustomerPage() {
     console.log('Current items state:', items);
   }, [items]);
 
+  const handleSortByPrice = () => {
+    const sorted = [...items].sort((a, b) => {
+      return sortOrder === 'asc'
+        ? a.iStartingPrice - b.iStartingPrice
+        : b.iStartingPrice - a.iStartingPrice;
+    });
+    setItems(sorted);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); // Toggle sort order
+  };
+
+  const handleSortByStartDate = () => {
+    const sorted = [...items].sort((a, b) => {
+      const dateA = new Date(a.iStartDate || '').getTime();
+      const dateB = new Date(b.iStartDate || '').getTime();
+      return startDateSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+    setItems(sorted);
+    setStartDateSortOrder(startDateSortOrder === 'asc' ? 'desc' : 'asc'); // Toggle sort order
+  };
+
+  const handleSortByEndDate = () => {
+    const sorted = [...items].sort((a, b) => {
+      const dateA = new Date(a.iEndDate || '').getTime();
+      const dateB = new Date(b.iEndDate || '').getTime();
+      return endDateSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+    setItems(sorted);
+    setEndDateSortOrder(endDateSortOrder === 'asc' ? 'desc' : 'asc'); // Toggle sort order
+  };
+
   return (
-    <div className="container mt-4">
-      <button id ="signin" onClick={signpage}>Sign in</button>
-      <h2>Items</h2>
+    // <div className="container mt-4">
+    //   <button id ="signin" onClick={signpage}>Sign in</button>
+    <Container>
+    <button onClick={signpage}>Sign in</button>
+    <br />
+      <Button variant="primary" onClick={handleSortByPrice}>
+        Sort by Price ({sortOrder === 'asc' ? 'Low to High' : 'High to Low'})
+      </Button>
+    <br/>
+    <Button variant="primary" onClick={handleSortByStartDate}>
+        Sort by Start Date ({startDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
+      </Button>
+    <br/>
+    <Button variant="primary" onClick={handleSortByEndDate}>
+        Sort by End Date ({endDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
+      </Button>
+    <Form>
+      <InputGroup className='my-3'>
+      <Form.Control onChange={(e)=> setSearch(e.target.value)} placeholder='Search items'/>
+      </InputGroup>
+    </Form>
+      <h2>Items</h2>                                              
       <div className="row">
         {items.length > 0 ? (
-          items.map((items, index) => (
+           items.filter((item)=>{
+            return search.toLowerCase() ==='' 
+            ? item 
+            : item.iName.toLowerCase().includes(search) ||
+              item.iDescription.toLowerCase().includes(search) ||
+              item.iStartingPrice.toString().includes(search)
+          }).map((items, index) => (
             <div key={index} className="col-lg-3  col-md-6 col-sm-11 mb-4">
               <div onClick={() => itemdetail(items)} className="card h-100">
                 <img
@@ -100,6 +164,7 @@ export default function CustomerPage() {
           <p className="text-center">No items available</p>
         )}
       </div>
-    </div>
+    {/* </div> */}
+    </Container>
   );
 }
