@@ -160,8 +160,10 @@ export default function Accounts() {
   };
 
   return (
-    <div>
+    <div className = 'account'>
       {/* Login */}
+      <div className="flex flex-col items-center space-y-4" id="design">
+        <h2>Login In</h2>
       <form onSubmit={loginAccount}>
         <input
           type="text"
@@ -177,12 +179,13 @@ export default function Accounts() {
           onChange={handleLoginInputChange}
           placeholder="Password"
         />
-        <button type="submit">Login</button>
+        <button className ='Login' type="submit">Login</button>
       </form>
 
-      <p>-----------------------------------------------------------------</p>
+      {/* <p>-----------------------------------------------------------------</p> */}
 
       {/* Create Account */}
+      <h2>Create Account</h2>
       <form onSubmit={handleCreateAccount}>
         <input
           type="text"
@@ -236,15 +239,15 @@ export default function Accounts() {
           <option value="seller">Seller</option>
         </select>
 
-        <button type="submit">Create Account</button>
+        <button id ="createAccount" type="submit">Create Account</button>
       </form>
 
-      <p>-----------------------------------------------------------------</p>
+      {/* <p>-----------------------------------------------------------------</p> */}
 
        {/* Close Account */}
        {/* Future implementation - account should only be closed by either admin or owner of account */}
        {/* Login */}
-      <form onSubmit={closeAccount}>
+      {/* <form onSubmit={closeAccount}>
         <input
           type="text"
           name="username"
@@ -253,7 +256,8 @@ export default function Accounts() {
           placeholder="Username"
         />
         <button type="submit">Close Account</button>
-      </form>
+      </form> */}
+    </div>
     </div>
   );
 }
