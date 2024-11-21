@@ -238,6 +238,21 @@ const toBase64 = (file: File): Promise<string> =>
     }
   };
 
+  const setPending = async (item_ID: number) => {
+    try {
+      await axios.post(
+        'https://fd0l3xd4ql.execute-api.us-east-1.amazonaws.com/pending-item/pending-item',
+        { item_ID },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      alert('Item status changed to pending successfully!');
+      fetchItems();
+    } catch (error: any) {
+      console.error('Failed to update item to pending:', error.response || error.message);
+      alert('Failed to update item status to pending: ' + (error.response ? error.response.data.message : error.message));
+    }
+  };
+  
   const selected_action = (itemId: number, action: string) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
@@ -248,6 +263,9 @@ const toBase64 = (file: File): Promise<string> =>
     }
     else if (action === 'Unpublish'){
       unpublishItem(itemId);
+    }
+    else if (action === 'Unfreeze') {
+      setPending(itemId);
     }
     else if(action === 'Fulfill'){
     
@@ -335,13 +353,12 @@ const toBase64 = (file: File): Promise<string> =>
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish" disabled={['active', 'completed', 'archived'].includes(item.iStatus || '')}>Publish</option>
-                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed'].includes(item.iStatus || '')}>Unpublish</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived', 'pending', 'frozen'].includes(item.iStatus || '')}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed', 'pending', 'frozen'].includes(item.iStatus || '')}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
-                    <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
-                    <option value="Archive">Archive</option>
-                    <option disabled value="Unfreeze">Unfreeze</option>
-                    {/* Add more options if needed */}
+                    <option value="Remove" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen'}>Remove</option>
+                    <option value="Archive" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen'}>Archive</option>
+                    <option value="Unfreeze" disabled={item.iStatus !== 'frozen'}>Unfreeze</option>
                   </select>
                 </td>
               </tr>
