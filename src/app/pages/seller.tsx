@@ -2,6 +2,9 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
+import Modal from 'react-bootstrap/Modal';
 
 interface Item {
   item_ID: number;
@@ -15,9 +18,6 @@ interface Item {
   duration?: number;
   iNumBids?: number;
 }
-
-
-
 
 interface Item {
   item_ID: number;
@@ -238,6 +238,42 @@ const toBase64 = (file: File): Promise<string> =>
     }
   };
 
+  function EditItemModal(props: any) {
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Edit Item
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
+            dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta ac
+            consectetur ac, vestibulum at eros.
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={props.onHide}>Close</Button>
+          {/*<Button variant="primary" onClick={editItem}>Save Changes</Button>*/}
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  const editItem = async (item_ID: number) => {
+    fetchItems();
+    const itemToEdit = items.find((item) => item.item_ID === item_ID) as Item | undefined;
+  }
+
+  const [editModal, seteditModal] = React.useState(false);
+
+
   const selected_action = (itemId: number, action: string) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
@@ -251,8 +287,8 @@ const toBase64 = (file: File): Promise<string> =>
     }
     else if(action === 'Fulfill'){
     
-     }
-     else if(action === 'Remove'){
+    }
+    else if(action === 'Remove'){
 
     }
     else if(action === 'Archive'){
@@ -264,7 +300,7 @@ const toBase64 = (file: File): Promise<string> =>
     else{
       alert("Select to proceed")
      } 
-    }
+  }
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
@@ -307,6 +343,7 @@ const toBase64 = (file: File): Promise<string> =>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1em', fontFamily: 'Arial, sans-serif' }}>
           <thead>
             <tr>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}></th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item ID</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item Name</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Description</th>
@@ -322,6 +359,7 @@ const toBase64 = (file: File): Promise<string> =>
           <tbody>
             {items.map((item, index) => (
               <tr key={index}>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><Button variant="outline-secondary" onClick={() => seteditModal(true)} >Edit</Button> <EditItemModal show={editModal} onHide={() => seteditModal(false)}/></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
@@ -340,6 +378,7 @@ const toBase64 = (file: File): Promise<string> =>
                     <option disabled value="Fulfill">Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active'}>Remove</option>
                     <option value="Archive">Archive</option>
+                    <option disabled value="Fulfil">Fulfil</option>
                     <option disabled value="Unfreeze">Unfreeze</option>
                     {/* Add more options if needed */}
                   </select>

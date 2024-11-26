@@ -10,13 +10,51 @@ interface BuyerData {
     funds?: string;
 }
 
+interface Item {
+    item_ID: number;
+    iName: string;
+    iDescription: string;
+    iImage: File;
+    iStartingPrice: number;
+    iStartDate?: string;
+    iEndDate?: string;
+    iStatus?: string;
+    duration?: number;
+    iNumBids?: number;
+  }
+
+
 export default function BuyerAccountPage() {
     // routing purpose
     const location = useLocation();
+    const [items, setItems] = useState<Item[]>([]);
+
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const [redraw, forceRedraw] = React.useState(0)  
     const usernamedata = location.state.username as string;
+
+
+    const fetchItems = async () => {
+        try {
+          const response = await axios.get('https://dkgwfpcoeb.execute-api.us-east-1.amazonaws.com/itemreview/review',
+            { params: { username: usernamedata }});
+          const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
+          console.log(responseData)
+          setItems(responseData.items || []);
+          forceRedraw(redraw + 1);
+        } catch (error) {
+          console.error('Failed to fetch items:', error);
+          setItems([]);
+        }
+      };
+    
+      useEffect(() => {
+        fetchItems();
+      }, []);
+
+
+
 
       // Function to fetch items from the API
     const fetchFunds = async () => {
