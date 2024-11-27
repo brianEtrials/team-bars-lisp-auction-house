@@ -65,9 +65,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
   
     -Close Account
 
-    -Place Bid
-
-    -Review Active Bids
+    -View Item
 
   Seller:
   
@@ -75,7 +73,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     
     -Request Unfreeze Item
     
-    -Edit Item
+    -Archive Item
 
   Customer:
   
