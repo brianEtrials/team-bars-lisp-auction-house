@@ -91,7 +91,7 @@ export default function BuyerItemDetail() {
       />
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
         <p><strong>Description:</strong> {item.iDescription}</p>
-        <p><strong>Starting Price:</strong> ${item.iStartingPrice}</p>
+        <p><strong>Price:</strong> ${item.iStartingPrice}</p>
         <p><strong>Start Date:</strong> {item.iStartDate || 'N/A'}</p>
         <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
       </div>
