@@ -28,23 +28,38 @@ export default function BuyerItemDetail() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch bids from Lambda function
     const fetchBids = async () => {
+      if (!item.item_ID) {
+        setError("Invalid item_ID provided.");
+        setLoading(false);
+        return;
+      }
       try {
-        const response = await fetch(`https://op26w7lak0.execute-api.us-east-1.amazonaws.com/readItemBids/readItemBids`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ item_ID: item.item_ID }),
-        });
+        const response = await fetch(
+          `https://5brq4rlzdh.execute-api.us-east-1.amazonaws.com/read-item-bids/read-item-bids`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_ID: item.item_ID }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`Failed to fetch bids: ${response.statusText}`);
         }
 
-        const data = await response.json();
-        setBids(data.biddata.bids);
+        const responseData = await response.json();
+        console.log("API response data:", responseData);
+
+        // Handle stringified body
+        if (typeof responseData.body === 'string') {
+          const parsedBody = JSON.parse(responseData.body);
+          setBids(parsedBody.biddata?.bids || []);
+        } else {
+          setBids(responseData.biddata?.bids || []);
+        }
       } catch (error: any) {
         setError(error.message);
       } finally {
@@ -55,9 +70,11 @@ export default function BuyerItemDetail() {
     fetchBids();
   }, [item.item_ID]);
 
+  console.log("Bids state after fetching:", bids);
+
   return (
-    <div>
-      <h1>{item.iName}</h1>
+    <div style={{ padding: '20px' }}>
+      <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>{item.iName}</h1>
       <img
         src={
           typeof item.iImage === 'string'
@@ -65,27 +82,75 @@ export default function BuyerItemDetail() {
             : URL.createObjectURL(item.iImage)
         }
         alt={item.iName}
-        style={{ maxHeight: '200px', objectFit: 'cover' }}
+        style={{
+          display: 'block',
+          margin: '0 auto',
+          maxHeight: '300px',
+          objectFit: 'cover',
+        }}
       />
-      <p><strong>Description:</strong> {item.iDescription}</p>
-      <p><strong>Starting Price:</strong> ${item.iStartingPrice}</p>
-      <p><strong>Start Date:</strong> {item.iStartDate || 'N/A'}</p>
-      <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <p><strong>Description:</strong> {item.iDescription}</p>
+        <p><strong>Starting Price:</strong> ${item.iStartingPrice}</p>
+        <p><strong>Start Date:</strong> {item.iStartDate || 'N/A'}</p>
+        <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
+      </div>
 
-      <h2>Bids</h2>
-      {loading && <p>Loading bids...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {!loading && bids.length === 0 && <p>No bids found for this item.</p>}
-      <ul>
-        {bids.map((bid) => (
-          <li key={bid.bid_ID}>
-            <p><strong>Bid ID:</strong> {bid.bid_ID}</p>
-            <p><strong>Buyer ID:</strong> {bid.buyer_ID}</p>
-            <p><strong>Amount:</strong> ${bid.amount}</p>
-            <p><strong>Timestamp:</strong> {bid.bidTimestamp}</p>
-          </li>
-        ))}
-      </ul>
+      <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Bids</h2>
+      {loading && <p style={{ textAlign: 'center' }}>Loading bids...</p>}
+      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+      {!loading && bids.length === 0 && <p style={{ textAlign: 'center' }}>No bids found for this item.</p>}
+
+      {!loading && bids.length > 0 && (
+        <div style={{ margin: '30px auto', maxWidth: '80%' }}>
+          <table
+            style={{
+              width: '100%',
+              textAlign: 'center',
+              borderCollapse: 'collapse',
+              border: '1px solid #ddd',
+              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <thead>
+              <tr style={{ backgroundColor: '#f4f4f4', fontWeight: 'bold' }}>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Bid ID</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Buyer ID</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Amount ($)</th>
+                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bids.map((bid) => (
+                <tr key={bid.bid_ID}>
+                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.bid_ID}</td>
+                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.buyer_ID}</td>
+                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.amount}</td>
+                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.bidTimestamp}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* BID Button */}
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <button
+          style={{
+            backgroundColor: '#cccccc',
+            color: '#fff',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'not-allowed',
+            fontSize: '16px',
+          }}
+          disabled
+        >
+          BID
+        </button>
+      </div>
     </div>
   );
 }

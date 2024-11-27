@@ -153,7 +153,7 @@ export default function CustomerPage() {
                 <div className="card-body">
                   <h5 className="card-title" >{items.iName}</h5>
                   <p className="card-text">{items.iDescription}</p>
-                  <p><strong>Starting Price:</strong> ${items.iStartingPrice}</p>
+                  <p><strong>Price:</strong> ${items.iStartingPrice}</p>
                   <p><strong>Start Date:</strong> {items.iStartDate || 'N/A'}</p>
                   <p><strong>End Date:</strong> {items.iEndDate || 'N/A'}</p>
                 </div>

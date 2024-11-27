@@ -222,7 +222,7 @@ export default function BuyerAccountPage() {
                                     <div className="card-body">
                                         <h5 className="card-title">{item.iName}</h5>
                                         <p className="card-text">{item.iDescription}</p>
-                                        <p><strong>Starting Price:</strong> ${item.iStartingPrice}</p>
+                                        <p><strong>Price:</strong> ${item.iStartingPrice}</p>
                                         <p><strong>Start Date:</strong> {item.iStartDate || 'N/A'}</p>
                                         <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
                                     </div>
