@@ -139,7 +139,7 @@ export default function Accounts() {
     <div className = 'account'>
       {/* Login */}
       <div className="flex flex-col items-center space-y-4" id="design">
-        <h2>Login In</h2>
+        <h2>Login</h2>
       <form className="Account" onSubmit={loginAccount}>
         <input
           type="text"

@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import CloseAccount from './closeaccounts';
-
+import Logout from './logout';
 
 interface Item {
   item_ID: number;
@@ -240,6 +240,26 @@ const toBase64 = (file: File): Promise<string> =>
     }
   };
 
+  const archiveItem = async (item_ID: number) => {
+    fetchItems();
+
+    try {
+      await axios.post( 'https://d70j4jm6gc.execute-api.us-east-1.amazonaws.com/archiveItem/archiveItem', { item_ID }, {
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      alert('Item archived successfully!');
+      fetchItems();
+    } catch (error: any) {
+      console.error('Failed to archive item:', error.response || error.message);
+      alert(
+        'Failed to archive item: ' +
+          (error.response ? error.response.data.message : error.message)
+      );
+    }
+  };
+
+
   const setPending = async (item_ID: number) => {
     try {
       await axios.post(
@@ -276,7 +296,7 @@ const toBase64 = (file: File): Promise<string> =>
 
     }
     else if(action === 'Archive'){
-
+      archiveItem(itemId);
     }
     else if(action === 'Unfreeze'){
 
@@ -358,8 +378,8 @@ const toBase64 = (file: File): Promise<string> =>
                     <option value="Publish" disabled={['active', 'completed', 'archived', 'pending', 'frozen'].includes(item.iStatus || '')}>Publish</option>
                     <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed', 'pending', 'frozen'].includes(item.iStatus || '')}>Unpublish</option>
                     <option disabled value="Fulfill">Fulfill</option>
-                    <option value="Remove" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen'}>Remove</option>
-                    <option value="Archive" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen'}>Archive</option>
+                    <option value="Remove" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen' || item.iStatus === 'archived'}>Remove</option>
+                    <option value="Archive" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen' || item.iStatus === 'completed' || item.iStatus === 'archived'}>Archive</option>
                     <option value="Unfreeze" disabled={item.iStatus !== 'frozen'}>Unfreeze</option>
                   </select>
                 </td>
@@ -371,6 +391,7 @@ const toBase64 = (file: File): Promise<string> =>
         <p style={{ textAlign: 'center' }}>No items available for review.</p>
       )}
       <CloseAccount id={accountInfo.idaccounts}/>
+      <Logout />
     </div>
   );
 }

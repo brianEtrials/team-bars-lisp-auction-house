@@ -3,17 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Logout from './logout';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeItemsCount, setActiveItemsCount] = useState(0);
+  const [totalBidsCount, setTotalBidsCount] = useState(0); // New state for total bids count
 
-  // Fetch active items count on component mount
+  // Fetch active items count and total bids count on component mount
   useEffect(() => {
-    const fetchActiveItemsCount = async () => {
+    const fetchAuctionMetrics = async () => {
       try {
         const response = await axios.get(
-          'https://i4xwqfzq9b.execute-api.us-east-1.amazonaws.com/get-items/get-items',
+          'https://u64oh2ryld.execute-api.us-east-1.amazonaws.com/auction-metrics/auction-metrics',
           {
             headers: { 'Content-Type': 'application/json' },
           }
@@ -24,13 +26,16 @@ export default function AdminDashboard() {
           : response.data.body;
 
         console.log("Active items count:", data.activeItemsCount);
+        console.log("Total bids count:", data.totalBidsCount);
+
         setActiveItemsCount(data.activeItemsCount);
+        setTotalBidsCount(data.totalBidsCount); // Set total bids count
       } catch (error) {
-        console.error('Failed to fetch active items count:', error);
+        console.error('Failed to fetch auction metrics:', error);
       }
     };
 
-    fetchActiveItemsCount();
+    fetchAuctionMetrics();
   }, []);
 
   const handleNavigate = (path: string) => {
@@ -54,7 +59,7 @@ export default function AdminDashboard() {
           </div>
           <div className="performance-card">
             <h3>Total Bids Placed</h3>
-            <p>--</p> {/* Placeholder */}
+            <p>{totalBidsCount}</p> {/* Updated to display total bids count */}
           </div>
           <div className="performance-card">
             <h3>Total Funds</h3>
@@ -64,6 +69,7 @@ export default function AdminDashboard() {
             <h3>Revenue Earned</h3>
             <p>--</p> {/* Placeholder */}
           </div>
+          <Logout />
         </div>
       </div>
     </div>

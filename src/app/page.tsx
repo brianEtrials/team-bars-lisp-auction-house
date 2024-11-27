@@ -10,6 +10,7 @@ import ItemDetail from './pages/itemDetail';
 import AdminDashboard from  './pages/adminDashboard';
 import AdminLogin from './pages/adminLogin';
 import ManageItems from './pages/manageItems';
+import BuyerItemDetail from './pages/buyerItemDetail';
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
@@ -30,6 +31,7 @@ export default function Page() {
       <Routes>
         <Route path="/" element={<CutomerPage />} />
         <Route path="/ItemDetail" element={<ItemDetail/>}/>
+        <Route path="/buyerItemDetail" element={<BuyerItemDetail />} />
         <Route path="/accounts" element={<Accounts />} />
         <Route path="/buyerAccountPage" element={<BuyerAccountPage />} />
         <Route path="/add_review_items" element={<FetchItemsComponent />} />
