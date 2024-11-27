@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from "react-router-dom";
 import axios from 'axios';
 import CloseAccount from './closeaccounts';
+import Logout from './logout';
 
 interface BuyerData {
     id?: number;
@@ -99,6 +100,7 @@ export default function BuyerAccountPage() {
                 </div>
             </div>
             <CloseAccount id={accountInfo.idaccounts}/>
+            <Logout />
         </main>
     );
 }

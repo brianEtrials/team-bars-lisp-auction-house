@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import CloseAccount from './closeaccounts';
-
+import Logout from './logout';
 
 interface Item {
   item_ID: number;
@@ -371,6 +371,7 @@ const toBase64 = (file: File): Promise<string> =>
         <p style={{ textAlign: 'center' }}>No items available for review.</p>
       )}
       <CloseAccount id={accountInfo.idaccounts}/>
+      <Logout />
     </div>
   );
 }
