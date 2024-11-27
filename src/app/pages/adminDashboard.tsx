@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Logout from './logout';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -68,6 +69,7 @@ export default function AdminDashboard() {
             <h3>Revenue Earned</h3>
             <p>--</p> {/* Placeholder */}
           </div>
+          <Logout />
         </div>
       </div>
     </div>

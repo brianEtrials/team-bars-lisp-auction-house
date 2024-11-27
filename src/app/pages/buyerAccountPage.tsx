@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from "react-router-dom";
 import axios from 'axios';
 import CloseAccount from './closeaccounts';
+import Logout from './logout';
 import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -171,7 +172,6 @@ export default function BuyerAccountPage() {
                     </button>
                 </div>
             </div>
-
             {/* Search and Sorting Section */}
             <div className="card mt-4 p-4">
                 <h3>Search and Sort Items</h3>
@@ -238,6 +238,9 @@ export default function BuyerAccountPage() {
             {/* Close Account Button */}
             <div className="card mt-4 p-4">
                 <CloseAccount id={accountInfo.idaccounts} />
+            </div>
+            <div className="card mt-4 p-4">
+                <Logout />
             </div>
         </div>
     );
