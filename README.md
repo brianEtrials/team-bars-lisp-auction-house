@@ -59,7 +59,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
     -Unpublish Item
 
-### Iteration 2: Use Cases (11)
+### Iteration 2: Use Cases (10)
 
   Buyer:
   
