@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 
 interface Item {
   item_ID: number;
@@ -21,6 +21,7 @@ interface Bid {
 
 export default function BuyerItemDetail() {
   const location = useLocation();
+  const navigate = useNavigate(); // Initialize navigate
   const item = location.state as Item;
 
   const [bids, setBids] = useState<Bid[]>([]);
@@ -74,6 +75,16 @@ export default function BuyerItemDetail() {
 
   return (
     <div style={{ padding: '20px' }}>
+      {/* Back Arrow Button */}
+      <div className="mb-4">
+        <button 
+          className="btn btn-primary" 
+          onClick={() => navigate("/buyerItemsPage")} // Navigate to buyerItemsPage
+        >
+          ← Back to Items
+        </button>
+      </div>
+
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>{item.iName}</h1>
       <img
         src={
