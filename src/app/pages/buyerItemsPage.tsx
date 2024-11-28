@@ -1,11 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useLocation } from "react-router-dom";
-import axios from 'axios';
-import CloseAccount from './closeaccounts';
-import Logout from './logout';
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
@@ -20,26 +17,13 @@ interface Item {
     iEndDate?: string;
 }
 
-interface BuyerData {
-    id?: number;
-    first_name?: string;
-    last_name?: string;
-    email?: string;
-    funds?: string;
-}
-
-export default function BuyerAccountPage() {
+export default function BuyerItemsPage() {
     const [items, setItems] = useState<Item[]>([]);
     const [search, setSearch] = useState('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
     const [startDateSortOrder, setStartDateSortOrder] = useState<'asc' | 'desc'>('asc');
     const [endDateSortOrder, setEndDateSortOrder] = useState<'asc' | 'desc'>('asc');
     const navigate = useNavigate();
-    const location = useLocation();
-    const [getdata, setdata] = useState<BuyerData>({});
-    const [inputValue, setInputValue] = useState('');
-    const usernamedata = location.state.username as string;
-    const accountInfo = location.state;
 
     const fetchItems = async () => {
         try {
@@ -62,51 +46,16 @@ export default function BuyerAccountPage() {
         }
     };
 
-    const fetchFunds = async () => {
-        try {
-            const response = await axios.get('https://zcyerq8t8e.execute-api.us-east-1.amazonaws.com/review-profile', {
-                params: { username: usernamedata },
-            });
-
-            const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
-            setdata(responseData);
-        } catch (error) {
-            console.error("Request error:", error);
-            alert("Failed to fetch funds");
-            setdata({});
-        }
-    };
-
     useEffect(() => {
         fetchItems();
-        fetchFunds();
     }, []);
 
     const viewItemDetails = (selectedItem: Item) => {
         navigate("/buyerItemDetail", { state: { ...selectedItem } });
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
-    };
-
-    const addAmount = async () => {
-        const amountToAdd = parseFloat(inputValue);
-        if (!isNaN(amountToAdd)) {
-            try {
-                await axios.post('https://tqqne0xyr2.execute-api.us-east-1.amazonaws.com/update-profile', {
-                    usernamedata, funds: amountToAdd
-                });
-                fetchFunds();
-                setInputValue('');
-                alert("Funds updated successfully!");
-            } catch (error: any) {
-                console.error("Failed to update funds:", error);
-                alert("Failed to update funds. " + (error.response ? error.response.data : error.message));
-            }
-        } else {
-            alert("Please enter a valid number.");
-        }
+    const goToProfile = () => {
+        navigate("/buyerProfilePage", { state: { username: "testbuyer" } });
     };
 
     const handleSortByPrice = () => {
@@ -148,32 +97,16 @@ export default function BuyerAccountPage() {
     });
 
     return (
-        <div className="container">
-            {/* Buyer Information and Funds Section */}
-            <div className="card mt-4 p-4">
-                <h3>Buyer Information</h3>
-                <p><strong>Name:</strong> {getdata?.first_name} {getdata?.last_name}</p>
-                <p><strong>Email:</strong> {getdata?.email}</p>
-                <div>
-                    <p><strong>Current Funds:</strong> ${getdata?.funds ?? 'Loading...'}</p>
-                    <input
-                        type="number"
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        placeholder="Enter amount"
-                        className="form-control"
-                    />
-                    <button
-                        className="btn btn-primary mt-2"
-                        onClick={addAmount}
-                        disabled={isNaN(parseFloat(inputValue)) || inputValue === ''}
-                    >
-                        Add Funds
-                    </button>
-                </div>
+        <div className="container mt-4">
+            {/* Button to Profile Page */}
+            <div className="mb-4">
+                <Button variant="primary" onClick={goToProfile}>
+                    Go to Profile
+                </Button>
             </div>
-            {/* Search and Sorting Section */}
-            <div className="card mt-4 p-4">
+
+            {/* Search and Sort Section */}
+            <div className="card p-4">
                 <h3>Search and Sort Items</h3>
                 <Form>
                     <InputGroup className="mb-3">
@@ -233,14 +166,6 @@ export default function BuyerAccountPage() {
                         <p className="text-center">No items available</p>
                     )}
                 </div>
-            </div>
-
-            {/* Close Account Button */}
-            <div className="card mt-4 p-4">
-                <CloseAccount id={accountInfo.idaccounts} />
-            </div>
-            <div className="card mt-4 p-4">
-                <Logout />
             </div>
         </div>
     );
