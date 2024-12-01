@@ -5,6 +5,7 @@ import axios from 'axios';
 import CloseAccount from './closeaccounts';
 import Logout from './logout';
 import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
+import logo from  '../../../img/logo.png'
 
 interface BuyerData {
     id?: number;
@@ -75,12 +76,12 @@ export default function BuyerProfilePage() {
             <div className="mb-4">
                 <button 
                     className="btn btn-primary" 
-                    onClick={() => navigate("/buyerItemsPage")} // Navigate to buyerItemsPage
+                    onClick={() => navigate("/buyer")} // Navigate to buyerItemsPage
                 >
                     ← Back to Items
                 </button>
             </div>
-
+            <Logout />
             <h2>Buyer Profile</h2>
             <div className="card p-4">
                 <p>
@@ -119,9 +120,9 @@ export default function BuyerProfilePage() {
             </div>
 
             {/* Logout Section */}
-            <div className="card mt-4 p-4">
+            {/* <div className="card mt-4 p-4">
                 <Logout />
-            </div>
+            </div> */}
         </div>
     );
 }

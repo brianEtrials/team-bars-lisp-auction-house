@@ -6,6 +6,8 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form"
 import InputGroup from "react-bootstrap/InputGroup"; 
 import Button from "react-bootstrap/Button"
+import logo from  '../../../img/logo.png'
+
 
 interface Item {
   item_ID: number;
@@ -106,28 +108,33 @@ export default function CustomerPage() {
     setEndDateSortOrder(endDateSortOrder === 'asc' ? 'desc' : 'asc'); // Toggle sort order
   };
 
-  return (
+  return (  
     // <div className="container mt-4">
     //   <button id ="signin" onClick={signpage}>Sign in</button>
     <Container>
-    <button onClick={signpage}>Sign in</button>
-    <br />
-      <Button variant="primary" onClick={handleSortByPrice}>
-        Sort by Price ({sortOrder === 'asc' ? 'Low to High' : 'High to Low'})
-      </Button>
-    <br/>
-    <Button variant="primary" onClick={handleSortByStartDate}>
-        Sort by Start Date ({startDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
-      </Button>
-    <br/>
-    <Button variant="primary" onClick={handleSortByEndDate}>
-        Sort by End Date ({endDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
-      </Button>
+    {/* <div className="p-3 border border-dark d-flex gap-2 align-items-center"> */}
+    <img src={logo.src} width="70px" height="70px" className="position-absolute top-2 start-20" alt="Button image"/>
+    <Button className="rounded-pill position-absolute top-2 end-20" onClick={signpage}>Sign in</Button>
+    <br/><br/>
     <Form>
       <InputGroup className='my-3'>
       <Form.Control onChange={(e)=> setSearch(e.target.value)} placeholder='Search items'/>
       </InputGroup>
     </Form>
+    {/* </div> */}
+    <div className="d-flex justify-content-center gap-3">
+      <Button className="btn btn-secondary" variant="primary" onClick={handleSortByPrice}>
+        Sort by Price ({sortOrder === 'asc' ? 'Low to High' : 'High to Low'})
+      </Button>
+    <br/>
+    <Button className="btn btn-secondary" variant="primary" onClick={handleSortByStartDate}>
+        Sort by Start Date ({startDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
+      </Button>
+    <br/>
+    <Button className="btn btn-secondary" variant="primary" onClick={handleSortByEndDate}>
+        Sort by End Date ({endDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
+      </Button>
+      </div>
       <h2>Items</h2>                                              
       <div className="row">
         {items.length > 0 ? (
@@ -139,14 +146,14 @@ export default function CustomerPage() {
               item.iStartingPrice.toString().includes(search)
           }).map((items, index) => (
             <div key={index} className="col-lg-3  col-md-6 col-sm-11 mb-4">
-              <div onClick={() => itemdetail(items)} className="card h-100">
+              <div onClick={() => itemdetail(items)} className="card h-100 border-secondary rounded-0 p-3">
                 <img
                   src={
                     typeof items.iImage === 'string'
                       ? items.iImage
                       : URL.createObjectURL(items.iImage)
                   }
-                  className="card-img-top"
+                  className="card-img-top border-0 rounded-0"
                   alt={items.iName}
                   style={{ maxHeight: '200px', objectFit: 'cover' }}
                 />

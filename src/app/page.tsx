@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Accounts from './pages/accounts';
 import BuyerItemsPage from './pages/buyerItemsPage';
+import BuyerSoldItemsPage from './pages/soldItems';
 import FetchItemsComponent from './pages/seller';
 import CutomerPage from './pages/customer';
 import ItemDetail from './pages/itemDetail';
@@ -12,6 +13,7 @@ import AdminLogin from './pages/adminLogin';
 import ManageItems from './pages/manageItems';
 import BuyerItemDetail from './pages/buyerItemDetail';
 import BuyerProfilePage from './pages/buyerProfilePage';
+import SoldItemDetail from './pages/soldItemDetail';
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
@@ -34,13 +36,14 @@ export default function Page() {
         <Route path="/ItemDetail" element={<ItemDetail/>}/>
         <Route path="/buyerItemDetail" element={<BuyerItemDetail />} />
         <Route path="/accounts" element={<Accounts />} />
-        <Route path="/buyerItemsPage" element={<BuyerItemsPage />} />
+        <Route path="/buyer" element={<BuyerItemsPage />} />
+        <Route path="/buyer/soldItems" element={<BuyerSoldItemsPage />} />
+        <Route path="/buyer/soldItem/detail" element={<SoldItemDetail/>}/>
         <Route path="/add_review_items" element={<FetchItemsComponent />} />
         <Route path="/adminLogin" element={<AdminLogin />} />
         <Route path="/adminDashboard" element={<AdminDashboard />} />
         <Route path="/manageItems" element={<ManageItems />} />
-        <Route path="/buyerProfilePage" element={<BuyerProfilePage />} />
-    
+        <Route path="/buyer/ProfilePage" element={<BuyerProfilePage />} />
       </Routes>
     </BrowserRouter>
   );
