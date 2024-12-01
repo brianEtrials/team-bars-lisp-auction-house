@@ -10,7 +10,6 @@ import logo from  '../../../img/logo.png'
 import profile from '../../../img/profile_page.png'
 import Logout from './logout';
 
-
 interface Item {
     item_ID: number;
     iName: string;
@@ -21,7 +20,7 @@ interface Item {
     iEndDate?: string;
 }
 
-export default function BuyerItemsPage() {
+export default function BuyerSoldItemsPage() {
     const [items, setItems] = useState<Item[]>([]);
     const [search, setSearch] = useState('');
     const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
@@ -32,7 +31,7 @@ export default function BuyerItemsPage() {
     const fetchItems = async () => {
         try {
             const response = await axios.get(
-                'https://qw583oxspk.execute-api.us-east-1.amazonaws.com/cutomer-view/customerView'
+                'https://2tmp7ig1t2.execute-api.us-east-1.amazonaws.com/soldItemView/soldItemView'
             );
             const responseData = typeof response.data.body === 'string'
                 ? JSON.parse(response.data.body)
@@ -55,15 +54,15 @@ export default function BuyerItemsPage() {
     }, []);
 
     const viewItemDetails = (selectedItem: Item) => {
-        navigate("/buyerItemDetail", { state: { ...selectedItem } });
+        navigate("/buyer/soldItem/detail", { state: { ...selectedItem } });
     };
 
     const goToProfile = () => {
         navigate("/buyer/ProfilePage", { state: { username: "testbuyer" } });
     };
 
-    const soldItems = () => {
-        navigate("/buyer/soldItems", { state: { username: "testbuyer" } });
+    const activeItems = () => {
+        navigate("/buyer", { state: { username: "testbuyer" } });
     };
 
     const handleSortByPrice = () => {
@@ -108,12 +107,13 @@ export default function BuyerItemsPage() {
         <div className="container mt-4">
             {/* Button to Profile Page */}
             <div className="mb-4">
-                    <img src={profile.src} onClick={goToProfile} width="30px" height="30px" className="position-absolute top-7 end-36" title="profile page"/>
-                    <Logout />
-                <Button onClick={soldItems}>Sold Items</Button>
+            <img src={profile.src} onClick={goToProfile} width="30px" height="30px" className="position-absolute top-7 end-36" title="profile page"/>
+            <Logout />
+            <Button onClick={activeItems}>Active Items</Button>
             </div>
 
             {/* Search and Sort Section */}
+            {/* <div className="card p-4"> */}
                 <Form>
                     <InputGroup className="mb-3">
                         <Form.Control
@@ -123,7 +123,7 @@ export default function BuyerItemsPage() {
                     </InputGroup>
                 </Form>
                 <div className="d-flex justify-content-center gap-3">
-                    <Button className="btn btn-secondary" variant="primary" onClick={handleSortByPrice}>
+                <Button className="btn btn-secondary" variant="primary" onClick={handleSortByPrice}>
                         Sort by Price ({sortOrder === 'asc' ? 'Low to High' : 'High to Low'})
                     </Button>
                     <Button className="btn btn-secondary" variant="primary" onClick={handleSortByStartDate}>
@@ -133,6 +133,7 @@ export default function BuyerItemsPage() {
                         Sort by End Date ({endDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
                     </Button>
                 </div>
+            {/* </div> */}
 
             {/* Items Section */}
             <div className="mt-4">
