@@ -6,9 +6,9 @@ import axios from 'axios';
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
-import logo from  '../../../img/logo.png'
 import profile from '../../../img/profile_page.png'
 import Logout from './logout';
+import secureLocalStorage from "react-secure-storage";
 
 interface Item {
     item_ID: number;
@@ -58,12 +58,72 @@ export default function BuyerSoldItemsPage() {
     };
 
     const goToProfile = () => {
-        navigate("/buyer/ProfilePage", { state: { username: "testbuyer" } });
-    };
+        // Retrieve the stored user credentials
+        const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      
+        if (storedCredentials) {
+          let parsedCredentials;
+          
+          // Check if the value is a string (i.e., needs to be parsed)
+          if (typeof storedCredentials === 'string') {
+            try {
+              parsedCredentials = JSON.parse(storedCredentials);
+            } catch (error) {
+              console.error("Failed to parse user credentials:", error);
+              alert("Failed to retrieve user information. Please log in again.");
+              return;
+            }
+          } else {
+            // If it's already an object, use it directly
+            parsedCredentials = storedCredentials;
+          }
+      
+          const loggedInUsername = parsedCredentials?.username;
+      
+          if (loggedInUsername) {
+            navigate("/buyer/ProfilePage", { state: { username: loggedInUsername } });
+          } else {
+            alert("Username not found.");
+          }
+        } else {
+          alert("Please log in first");
+        }
+      };      
 
-    const activeItems = () => {
-        navigate("/buyer", { state: { username: "testbuyer" } });
-    };
+
+      const activeItems = () => {
+        // Retrieve the stored user credentials
+        const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      
+        if (storedCredentials) {
+          let parsedCredentials;
+          
+          // Check if the value is a string (i.e., needs to be parsed)
+          if (typeof storedCredentials === 'string') {
+            try {
+              parsedCredentials = JSON.parse(storedCredentials);
+            } catch (error) {
+              console.error("Failed to parse user credentials:", error);
+              alert("Failed to retrieve user information. Please log in again.");
+              return;
+            }
+          } else {
+            // If it's already an object, use it directly
+            parsedCredentials = storedCredentials;
+          }
+      
+          const loggedInUsername = parsedCredentials?.username;
+      
+          if (loggedInUsername) {
+            navigate("/buyer", { state: { username: loggedInUsername } });
+        } else {
+            alert("Username not found.");
+          }
+        } else {
+          alert("Please log in first");
+        }
+      };    
+
 
     const handleSortByPrice = () => {
         const sorted = [...items].sort((a, b) => {
@@ -137,7 +197,7 @@ export default function BuyerSoldItemsPage() {
 
             {/* Items Section */}
             <div className="mt-4">
-                <h3>Available Items</h3>
+                <h3>Sold Items in the last 24 hours</h3>
                 <div className="row">
                     {filteredItems.length > 0 ? (
                         filteredItems.map((item, index) => (

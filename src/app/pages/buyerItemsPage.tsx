@@ -6,10 +6,9 @@ import axios from 'axios';
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
-import logo from  '../../../img/logo.png'
+import secureLocalStorage from "react-secure-storage";
 import profile from '../../../img/profile_page.png'
 import Logout from './logout';
-
 
 interface Item {
     item_ID: number;
@@ -59,12 +58,71 @@ export default function BuyerItemsPage() {
     };
 
     const goToProfile = () => {
-        navigate("/buyer/ProfilePage", { state: { username: "testbuyer" } });
-    };
+        // Retrieve the stored user credentials
+        const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      
+        if (storedCredentials) {
+          let parsedCredentials;
+          
+          // Check if the value is a string (i.e., needs to be parsed)
+          if (typeof storedCredentials === 'string') {
+            try {
+              parsedCredentials = JSON.parse(storedCredentials);
+            } catch (error) {
+              console.error("Failed to parse user credentials:", error);
+              alert("Failed to retrieve user information. Please log in again.");
+              return;
+            }
+          } else {
+            // If it's already an object, use it directly
+            parsedCredentials = storedCredentials;
+          }
+      
+          const loggedInUsername = parsedCredentials?.username;
+      
+          if (loggedInUsername) {
+            navigate("/buyer/ProfilePage", { state: { username: loggedInUsername } });
+          } else {
+            alert("Username not found.");
+          }
+        } else {
+          alert("Please log in first");
+        }
+      };      
 
-    const soldItems = () => {
-        navigate("/buyer/soldItems", { state: { username: "testbuyer" } });
-    };
+
+      const soldItems = () => {
+        // Retrieve the stored user credentials
+        const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      
+        if (storedCredentials) {
+          let parsedCredentials;
+          
+          // Check if the value is a string (i.e., needs to be parsed)
+          if (typeof storedCredentials === 'string') {
+            try {
+              parsedCredentials = JSON.parse(storedCredentials);
+            } catch (error) {
+              console.error("Failed to parse user credentials:", error);
+              alert("Failed to retrieve user information. Please log in again.");
+              return;
+            }
+          } else {
+            // If it's already an object, use it directly
+            parsedCredentials = storedCredentials;
+          }
+      
+          const loggedInUsername = parsedCredentials?.username;
+      
+          if (loggedInUsername) {
+            navigate("/buyer/soldItems", { state: { username: loggedInUsername } });
+        } else {
+            alert("Username not found.");
+          }
+        } else {
+          alert("Please log in first");
+        }
+      };    
 
     const handleSortByPrice = () => {
         const sorted = [...items].sort((a, b) => {
@@ -114,7 +172,7 @@ export default function BuyerItemsPage() {
             </div>
 
             {/* Search and Sort Section */}
-                <Form>
+            <Form>
                     <InputGroup className="mb-3">
                         <Form.Control
                             onChange={(e) => setSearch(e.target.value)}
@@ -146,14 +204,14 @@ export default function BuyerItemsPage() {
                                 onClick={() => viewItemDetails(item)}
                                 style={{ cursor: 'pointer' }}
                             >
-                                <div className="card h-100 border-secondary rounded-0 p-3">
+                                <div className="card h-100">
                                     <img
                                         src={
                                             typeof item.iImage === "string"
                                                 ? item.iImage
                                                 : URL.createObjectURL(item.iImage)
                                         }
-                                        className="card-img-top border-0 rounded-0"
+                                        className="card-img-top"
                                         alt={item.iName}
                                         style={{ maxHeight: '200px', objectFit: 'cover' }}
                                     />
@@ -175,3 +233,4 @@ export default function BuyerItemsPage() {
         </div>
     );
 }
+
