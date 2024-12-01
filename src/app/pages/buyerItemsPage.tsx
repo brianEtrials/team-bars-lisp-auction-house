@@ -7,6 +7,8 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import secureLocalStorage from "react-secure-storage";
+import profile from '../../../img/profile_page.png'
+import Logout from './logout';
 
 interface Item {
     item_ID: number;
@@ -79,7 +81,7 @@ export default function BuyerItemsPage() {
           const loggedInUsername = parsedCredentials?.username;
       
           if (loggedInUsername) {
-            navigate("/buyerProfilePage", { state: { username: loggedInUsername } });
+            navigate("/buyer/ProfilePage", { state: { username: loggedInUsername } });
           } else {
             alert("Username not found.");
           }
@@ -87,6 +89,40 @@ export default function BuyerItemsPage() {
           alert("Please log in first");
         }
       };      
+
+
+      const soldItems = () => {
+        // Retrieve the stored user credentials
+        const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      
+        if (storedCredentials) {
+          let parsedCredentials;
+          
+          // Check if the value is a string (i.e., needs to be parsed)
+          if (typeof storedCredentials === 'string') {
+            try {
+              parsedCredentials = JSON.parse(storedCredentials);
+            } catch (error) {
+              console.error("Failed to parse user credentials:", error);
+              alert("Failed to retrieve user information. Please log in again.");
+              return;
+            }
+          } else {
+            // If it's already an object, use it directly
+            parsedCredentials = storedCredentials;
+          }
+      
+          const loggedInUsername = parsedCredentials?.username;
+      
+          if (loggedInUsername) {
+            navigate("/buyer/soldItems", { state: { username: loggedInUsername } });
+        } else {
+            alert("Username not found.");
+          }
+        } else {
+          alert("Please log in first");
+        }
+      };    
 
     const handleSortByPrice = () => {
         const sorted = [...items].sort((a, b) => {
@@ -130,15 +166,13 @@ export default function BuyerItemsPage() {
         <div className="container mt-4">
             {/* Button to Profile Page */}
             <div className="mb-4">
-                <Button variant="primary" onClick={goToProfile}>
-                    Go to Profile
-                </Button>
+                    <img src={profile.src} onClick={goToProfile} width="30px" height="30px" className="position-absolute top-7 end-36" title="profile page"/>
+                    <Logout />
+                <Button onClick={soldItems}>Sold Items</Button>
             </div>
 
             {/* Search and Sort Section */}
-            <div className="card p-4">
-                <h3>Search and Sort Items</h3>
-                <Form>
+            <Form>
                     <InputGroup className="mb-3">
                         <Form.Control
                             onChange={(e) => setSearch(e.target.value)}
@@ -146,18 +180,17 @@ export default function BuyerItemsPage() {
                         />
                     </InputGroup>
                 </Form>
-                <div>
-                    <Button className="m-1" variant="primary" onClick={handleSortByPrice}>
+                <div className="d-flex justify-content-center gap-3">
+                    <Button className="btn btn-secondary" variant="primary" onClick={handleSortByPrice}>
                         Sort by Price ({sortOrder === 'asc' ? 'Low to High' : 'High to Low'})
                     </Button>
-                    <Button className="m-1" variant="primary" onClick={handleSortByStartDate}>
+                    <Button className="btn btn-secondary" variant="primary" onClick={handleSortByStartDate}>
                         Sort by Start Date ({startDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
                     </Button>
-                    <Button className="m-1" variant="primary" onClick={handleSortByEndDate}>
+                    <Button className="btn btn-secondary" variant="primary" onClick={handleSortByEndDate}>
                         Sort by End Date ({endDateSortOrder === 'asc' ? 'Low to High' : 'High to Low'})
                     </Button>
                 </div>
-            </div>
 
             {/* Items Section */}
             <div className="mt-4">
