@@ -6,6 +6,7 @@ import axios from 'axios';
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
+import secureLocalStorage from "react-secure-storage";
 
 interface Item {
     item_ID: number;
@@ -55,8 +56,37 @@ export default function BuyerItemsPage() {
     };
 
     const goToProfile = () => {
-        navigate("/buyerProfilePage", { state: { username: "testbuyer" } });
-    };
+        // Retrieve the stored user credentials
+        const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      
+        if (storedCredentials) {
+          let parsedCredentials;
+          
+          // Check if the value is a string (i.e., needs to be parsed)
+          if (typeof storedCredentials === 'string') {
+            try {
+              parsedCredentials = JSON.parse(storedCredentials);
+            } catch (error) {
+              console.error("Failed to parse user credentials:", error);
+              alert("Failed to retrieve user information. Please log in again.");
+              return;
+            }
+          } else {
+            // If it's already an object, use it directly
+            parsedCredentials = storedCredentials;
+          }
+      
+          const loggedInUsername = parsedCredentials?.username;
+      
+          if (loggedInUsername) {
+            navigate("/buyerProfilePage", { state: { username: loggedInUsername } });
+          } else {
+            alert("Username not found.");
+          }
+        } else {
+          alert("Please log in first");
+        }
+      };      
 
     const handleSortByPrice = () => {
         const sorted = [...items].sort((a, b) => {
