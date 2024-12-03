@@ -3,21 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import CloseAccount from './closeaccounts';
 import Logout from './logout';
-
-interface Item {
-  item_ID: number;
-  iName: string;
-  iDescription: string;
-  iImage: File;
-  iStartingPrice: number;
-  iStartDate?: string;
-  iEndDate?: string;
-  iStatus?: string;
-  duration?: number;
-  iNumBids?: number;
-}
-
-
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Button, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
 
 
 interface Item {
@@ -275,6 +262,109 @@ const toBase64 = (file: File): Promise<string> =>
     }
   };
   
+
+  
+  function EditForm() {
+    const [validated, setValidated] = useState(false);
+
+    const handleSubmit = (event) => {
+      const form = event.currentTarget;
+      if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      setValidated(true);
+    }
+    return (
+      <Form noValidate validated={validated} onSubmit={handleSubmit}>
+        {/* Item Name */}
+        <Form.Group as={Col} md="6" controlId="validationItemName">
+          <Form.Label>Item Name</Form.Label>
+          <Form.Control required type="text" placeholder="Enter item name" />
+          <Form.Control.Feedback>Good enough</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+           Please provide an item name.
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Description */}
+        <Form.Group as={Col} md="6" controlId="validationDescription">
+          <Form.Label>Description</Form.Label>
+          <Form.Control required type="text" placeholder="Enter item description" />
+          <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Please provide an item description.
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Image Upload */}
+        <Form.Group as={Col} md="6" controlId="validationImage">
+          <Form.Label>Image</Form.Label>
+          <Form.Control required type="file" accept="image/*" />
+          <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Please provide an item image.
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Starting Price */}
+        <Form.Group as={Col} md="6" controlId="validationStartingPrice">
+          <Form.Label>Starting Price</Form.Label>
+          <Form.Control required type="number" placeholder="Enter starting price" />
+          <Form.Control.Feedback>Good enough</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Please provide a starting price. (At least 1$)
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Duration */}
+        <Form.Group as={Col} md="6" controlId="validationDuration">
+          <Form.Label>Duration (in days)</Form.Label>
+          <Form.Control type="number" placeholder="Enter duration in days" />
+          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Please provide a valid duration.
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Form>
+    );
+  }
+  
+  
+
+  function EditItemModal(props: any) {
+    return (
+      <Modal
+        {...props}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Edit Item
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <EditForm/>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={props.onHide}>Close</Button>
+          {/*<Button variant="primary" onClick={editItem}>Save Changes</Button>*/}
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  const editItem = async (item_ID: number) => {
+    fetchItems();
+    const itemToEdit = items.find((item) => item.item_ID === item_ID) as Item | undefined;
+  }
+
+  const [editModal, seteditModal] = React.useState(false);
+
+
   const selected_action = (itemId: number, action: string) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
@@ -347,6 +437,7 @@ const toBase64 = (file: File): Promise<string> =>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1em', fontFamily: 'Arial, sans-serif' }}>
           <thead>
             <tr>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}></th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item ID</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item Name</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Description</th>
@@ -362,6 +453,7 @@ const toBase64 = (file: File): Promise<string> =>
           <tbody>
             {items.map((item, index) => (
               <tr key={index}>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><Button variant="outline-secondary" onClick={() => seteditModal(true)} >Edit</Button> <EditItemModal show={editModal} onHide={() => seteditModal(false)}/></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>

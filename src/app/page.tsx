@@ -11,6 +11,8 @@ import AdminDashboard from  './pages/adminDashboard';
 import AdminLogin from './pages/adminLogin';
 import ManageItems from './pages/manageItems';
 import BuyerItemDetail from './pages/buyerItemDetail';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
