@@ -375,9 +375,9 @@ const toBase64 = (file: File): Promise<string> =>
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
                     {/* <option value="Remove">Remove</option> */}
-                    <option value="Publish" disabled={['active', 'completed', 'archived', 'pending', 'frozen'].includes(item.iStatus || '')}>Publish</option>
-                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed', 'pending', 'frozen'].includes(item.iStatus || '')}>Unpublish</option>
-                    <option disabled value="Fulfill">Fulfill</option>
+                    <option value="Publish" disabled={['active', 'completed', 'archived', 'pending', 'frozen', 'fulfilled'].includes(item.iStatus || '')}>Publish</option>
+                    <option value="Unpublish" disabled={['inactive', 'completed', 'archived', 'failed', 'pending', 'frozen', 'fulfilled'].includes(item.iStatus || '')}>Unpublish</option>
+                    <option value="Fulfill" disabled={item.iStatus !== 'completed'}>Fulfill</option>
                     <option value="Remove" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen' || item.iStatus === 'archived'}>Remove</option>
                     <option value="Archive" disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen' || item.iStatus === 'completed' || item.iStatus === 'archived'}>Archive</option>
                     <option value="Unfreeze" disabled={item.iStatus !== 'frozen'}>Unfreeze</option>

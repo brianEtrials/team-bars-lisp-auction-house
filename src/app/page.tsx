@@ -11,6 +11,7 @@ import ItemDetail from './pages/itemDetail';
 import AdminDashboard from  './pages/adminDashboard';
 import AdminLogin from './pages/adminLogin';
 import ManageItems from './pages/manageItems';
+import AuctionReport from './pages/auctionReport';
 import BuyerItemDetail from './pages/buyerItemDetail';
 import BuyerProfilePage from './pages/buyerProfilePage';
 import SoldItemDetail from './pages/soldItemDetail';
@@ -43,6 +44,7 @@ export default function Page() {
         <Route path="/adminLogin" element={<AdminLogin />} />
         <Route path="/adminDashboard" element={<AdminDashboard />} />
         <Route path="/manageItems" element={<ManageItems />} />
+        <Route path="/auctionReport" element={<AuctionReport />} />
         <Route path="/buyer/ProfilePage" element={<BuyerProfilePage />} />
       </Routes>
     </BrowserRouter>
