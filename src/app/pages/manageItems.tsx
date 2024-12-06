@@ -1,5 +1,5 @@
 'use client';
-
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 
@@ -66,6 +66,16 @@ export default function ManageItems() {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ marginBottom: '20px' }}>
+        {/* Back to Dashboard Button */}
+        <div className="mb-4"></div>
+        <Link to="/adminDashboard">
+          <button className="btn btn-primary">
+            ← Back to Dashboard
+          </button>
+        </Link>
+      </div>
+
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>Manage Items</h1>
       {items.length > 0 ? (
         <table
