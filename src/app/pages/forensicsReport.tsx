@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';  // Import Link from React Router
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-export default function AuctionReport() {
+export default function ForensicsReport() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [auctionReport, setAuctionReport] = useState([]);
+  const [forensicsReport, setForensicsReport] = useState([]);
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   const downloadCSV = () => {
     const headers = ["Item ID", "Item Name", "Total Bids", "Sale Price", "Buyer ID", "Seller ID", "Auction End Date", "Commission Earned"];
-    const rows = auctionReport.map(item => [
+    const rows = forensicsReport.map(item => [
       item['Item ID'],
       item['Item Name'],
       item['Total Bids'],
@@ -30,19 +30,13 @@ export default function AuctionReport() {
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", "auction_report.csv");
+    link.setAttribute("download", "forensics_report.csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const calculateTotals = () => {
-    const totalSales = auctionReport.reduce((sum, item) => sum + parseFloat(item['Sale Price'] || 0), 0);
-    const totalCommissions = auctionReport.reduce((sum, item) => sum + parseFloat(item['Commission Earned'] || 0), 0);
-    return { totalSales, totalCommissions };
-  };
-
-  const fetchAuctionReport = async () => {
+  const fetchForensicsReport = async () => {
     if (!startDate || !endDate) {
       alert("Please select both start and end dates");
       return;
@@ -57,21 +51,19 @@ export default function AuctionReport() {
       };
 
       const response = await axios.post(
-        'https://6jteaywfs8.execute-api.us-east-1.amazonaws.com/auction-report/auction-report',
+        'https://9r1wd8xsk8.execute-api.us-east-1.amazonaws.com/forensics-report/forensics-report',
         JSON.stringify({ body: JSON.stringify(requestBody) }),
         { headers: { 'Content-Type': 'application/json' } }
       );
 
       const responseBody = JSON.parse(response.data.body);
-      const data = Array.isArray(responseBody.auctionReport) ? responseBody.auctionReport : [];
-      setAuctionReport(data);
+      const data = Array.isArray(responseBody.forensicsReport) ? responseBody.forensicsReport : [];
+      setForensicsReport(data);
       setIsDataFetched(true);
     } catch (error) {
       console.error('Failed to fetch auction report:', error);
     }
   };
-
-  const { totalSales, totalCommissions } = calculateTotals();
 
   return (
     <div style={{ padding: '20px' }}>
@@ -85,45 +77,8 @@ export default function AuctionReport() {
         </Link>
       </div>
 
-      <h1>Auction Report</h1>
-
-      <div className="date-filter" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-      <div>
-        <span style={{ display: 'inline-block', marginRight: '10px' }}>
-            <label htmlFor="start-date" style={{ marginRight: '5px' }}>Report from:</label>
-            <input
-            id="start-date"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            style={{ padding: '10px', marginRight: '10px' }}
-            />
-        </span>
-        <span style={{ display: 'inline-block', marginRight: '10px' }}>
-            <label htmlFor="end-date" style={{ marginRight: '5px' }}>To:</label>
-            <input
-            id="end-date"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            style={{ padding: '10px', marginRight: '10px' }}
-            />
-        </span>
-        <button onClick={fetchAuctionReport} style={{ padding: '10px 20px' }}>
-            Done
-        </button>
-        </div>
-      </div>
-
-      {isDataFetched && startDate && endDate && (
-        <div style={{ marginBottom: '20px', textAlign: 'right' }}>
-          <p><strong>Summary (From {startDate} To {endDate})</strong></p>
-          <p><strong>Total Sales: {totalSales.toFixed(2)} USD</strong></p>
-          <p><strong>Total Commissions Earned: {totalCommissions.toFixed(2)} USD</strong></p>
-        </div>
-      )}
-
-      {auctionReport.length > 0 && (
+      <h1>Forensics Report</h1>
+      {forensicsReport.length > 0 && (
         <div>
           <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1em', fontFamily: 'Arial, sans-serif' }}>
             <thead>
@@ -139,7 +94,7 @@ export default function AuctionReport() {
               </tr>
             </thead>
             <tbody>
-              {auctionReport.map((item, index) => (
+              {forensicsReport.map((item, index) => (
                 <tr key={index}>
                   <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item['Item ID']}</td>
                   <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item['Item Name']}</td>
