@@ -299,3 +299,36 @@ form:last-of-type {
   cursor: not-allowed;
 }
 
+/* Some css for item cards */
+.image-container {
+  padding: 10px; /* Add space around the image */
+  background: #f8f9fa; /* Optional: Add a background to highlight the padding */
+  border-radius: 0.75rem; /* Match card border radius */
+}
+
+.image-container img {
+  width: 100%;
+  height: 200px; /* Uniform height */
+  object-fit: cover; /* Ensures consistent cropping */
+  border-radius: 0.5rem; /* Add slight rounding to images */
+}
+
+.card {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.card-title, .card-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row.g-4 {
+  row-gap: 1.5rem;
+  column-gap: 1rem;
+}
