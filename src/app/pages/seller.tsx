@@ -44,6 +44,7 @@ export default function FetchItemsComponent() {
     iImage: '',
     iStartingPrice: '',
     duration: '',
+    type: 'Auction',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [redraw, forceRedraw] = useState(0);
@@ -72,6 +73,7 @@ export default function FetchItemsComponent() {
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debugger;
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
 
@@ -128,7 +130,7 @@ const base64Image = await toBase64(imageFile);
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: ''});
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '', type: ''});
       setImageFile(null);
       fetchItems();
     } catch (error: any) {
@@ -337,6 +339,34 @@ const toBase64 = (file: File): Promise<string> =>
           <label style={{ width: '150px', fontWeight: 'bold' }}>Duration (days)</label>
           <input name="duration" type="number" value={newItem.duration} onChange={handleInputChange} placeholder="Duration (days)" style={{ flex: 1, padding: '8px', fontSize: '16px' }} />
         </div>
+        <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ width: '150px', fontWeight: 'bold' }}>Type</label>
+          <div style={{ flex: 1, display: 'flex', gap: '10px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="type"
+                value="Auction"
+                checked={newItem.type === 'Auction'}
+                onChange={handleInputChange}
+              />
+              Auction
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+              <input
+                type="radio"
+                name="type"
+                value="Buy Now"
+                checked={newItem.type === 'Buy Now'}
+                onChange={handleInputChange}
+              />
+              Buy Now
+            </label>
+          </div>
+        </div>
+      </div>
+
         <button onClick={addItem} style={{ padding: '10px', fontSize: '16px', backgroundColor: '#4CAF50', color: 'white', border: 'none', cursor: 'pointer', borderRadius: '5px', marginTop: '10px' }}>
           Add Item
         </button>
