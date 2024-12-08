@@ -88,22 +88,30 @@ export default function AuctionReport() {
       <h1>Auction Report</h1>
 
       <div className="date-filter" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <div>
-          <input
+      <div>
+        <span style={{ display: 'inline-block', marginRight: '10px' }}>
+            <label htmlFor="start-date" style={{ marginRight: '5px' }}>Report from:</label>
+            <input
+            id="start-date"
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             style={{ padding: '10px', marginRight: '10px' }}
-          />
-          <input
+            />
+        </span>
+        <span style={{ display: 'inline-block', marginRight: '10px' }}>
+            <label htmlFor="end-date" style={{ marginRight: '5px' }}>To:</label>
+            <input
+            id="end-date"
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             style={{ padding: '10px', marginRight: '10px' }}
-          />
-          <button onClick={fetchAuctionReport} style={{ padding: '10px 20px' }}>
+            />
+        </span>
+        <button onClick={fetchAuctionReport} style={{ padding: '10px 20px' }}>
             Done
-          </button>
+        </button>
         </div>
       </div>
 

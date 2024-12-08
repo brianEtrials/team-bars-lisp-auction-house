@@ -15,6 +15,7 @@ import AuctionReport from './pages/auctionReport';
 import BuyerItemDetail from './pages/buyerItemDetail';
 import BuyerProfilePage from './pages/buyerProfilePage';
 import SoldItemDetail from './pages/soldItemDetail';
+import ForensicsReport from './pages/forensicsReport';
 
 export default function Page() {
   const [isClient, setIsClient] = useState(false);
@@ -46,6 +47,7 @@ export default function Page() {
         <Route path="/manageItems" element={<ManageItems />} />
         <Route path="/auctionReport" element={<AuctionReport />} />
         <Route path="/buyer/ProfilePage" element={<BuyerProfilePage />} />
+        <Route path="/forensicsReport" element={<ForensicsReport />} />
       </Routes>
     </BrowserRouter>
   );
