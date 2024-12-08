@@ -25,6 +25,7 @@ export default function FetchItemsComponent() {
   const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
   const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '' });  // State for seller information
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
@@ -264,24 +265,43 @@ const toBase64 = (file: File): Promise<string> =>
   
 
   
-  function EditForm() {
+  function EditForm({ item, onSave }: { item: Item | null; onSave: (updatedItem: Partial<Item>) => void }) {
     const [validated, setValidated] = useState(false);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
       const form = event.currentTarget;
+
       if (form.checkValidity() === false) {
         event.preventDefault();
         event.stopPropagation();
       }
 
       setValidated(true);
-    }
+
+      const updatedItem: Partial<Item> = {
+        iName: (form.elements.namedItem("iName") as HTMLInputElement).value,
+        iDescription: (form.elements.namedItem("iDescription") as HTMLInputElement).value,
+        iStartingPrice: parseFloat((form.elements.namedItem("iStartingPrice") as HTMLInputElement).value),
+        duration: parseInt((form.elements.namedItem("duration") as HTMLInputElement).value, 10),
+      };
+
+      const imageInput = form.elements.namedItem("iImage") as HTMLInputElement;
+      if (imageInput.files && imageInput.files.length > 0) { 
+        updatedItem.iImage = imageInput.files[0]; 
+      };
+
+      onSave(updatedItem);
+    };
+
     return (
       <Form noValidate validated={validated} onSubmit={handleSubmit}>
         {/* Item Name */}
         <Form.Group as={Col} md="6" controlId="validationItemName">
           <Form.Label>Item Name</Form.Label>
-          <Form.Control required type="text" placeholder="Enter item name" />
+          <Form.Control required type="text" name="iName" defaultValue={item?.iName} placeholder="Enter item name" />
           <Form.Control.Feedback>Good enough</Form.Control.Feedback>
           <Form.Control.Feedback type="invalid">
            Please provide an item name.
@@ -291,7 +311,7 @@ const toBase64 = (file: File): Promise<string> =>
         {/* Description */}
         <Form.Group as={Col} md="6" controlId="validationDescription">
           <Form.Label>Description</Form.Label>
-          <Form.Control required type="text" placeholder="Enter item description" />
+          <Form.Control required type="text" name="iDescription" defaultValue={item?.iDescription} placeholder="Enter item description" />
           <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
           <Form.Control.Feedback type="invalid">
             Please provide an item description.
@@ -301,7 +321,12 @@ const toBase64 = (file: File): Promise<string> =>
         {/* Image Upload */}
         <Form.Group as={Col} md="6" controlId="validationImage">
           <Form.Label>Image</Form.Label>
-          <Form.Control required type="file" accept="image/*" />
+          <Form.Control type="file" name="iImage" accept="image/*" />
+          {item?.iImage && (
+            <div style={{ marginTop: '10px', fontStyle: 'italic' }}>
+              Upload a new image to replace the old one, or leave this empty to keep the current image.
+            </div>
+          )}            
           <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
           <Form.Control.Feedback type="invalid">
             Please provide an item image.
@@ -311,7 +336,7 @@ const toBase64 = (file: File): Promise<string> =>
         {/* Starting Price */}
         <Form.Group as={Col} md="6" controlId="validationStartingPrice">
           <Form.Label>Starting Price</Form.Label>
-          <Form.Control required type="number" placeholder="Enter starting price" />
+          <Form.Control required type="number" name="iStartingPrice" defaultValue={item?.iStartingPrice} placeholder="Enter starting price" />
           <Form.Control.Feedback>Good enough</Form.Control.Feedback>
           <Form.Control.Feedback type="invalid">
             Please provide a starting price. (At least 1$)
@@ -321,22 +346,23 @@ const toBase64 = (file: File): Promise<string> =>
         {/* Duration */}
         <Form.Group as={Col} md="6" controlId="validationDuration">
           <Form.Label>Duration (in days)</Form.Label>
-          <Form.Control type="number" placeholder="Enter duration in days" />
+          <Form.Control type="number" name="duration" defaultValue={item?.duration} placeholder="Enter duration in days" />
           <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
           <Form.Control.Feedback type="invalid">
             Please provide a valid duration.
           </Form.Control.Feedback>
         </Form.Group>
+        <Button variant="primary" type="submit"> Save Changes</Button>
       </Form>
     );
   }
   
   
 
-  function EditItemModal(props: any) {
+  function EditItemModal({ show, onHide, item, onSave, }: { show: boolean, onHide: () => void, item: Item | null, onSave: (updatedItem: Partial<Item>) => void; }) {
     return (
       <Modal
-        {...props}
+        show={show} onHide={onHide}
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
@@ -347,22 +373,75 @@ const toBase64 = (file: File): Promise<string> =>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <EditForm/>
+          <EditForm item={item} onSave={(updatedItem) => {
+            onSave({ ...item, ...updatedItem});
+            onHide();
+          }}/>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={props.onHide}>Close</Button>
+          <Button variant="secondary" onClick={onHide}>Close</Button>
           {/*<Button variant="primary" onClick={editItem}>Save Changes</Button>*/}
         </Modal.Footer>
       </Modal>
     );
   }
 
-  const editItem = async (item_ID: number) => {
-    fetchItems();
-    const itemToEdit = items.find((item) => item.item_ID === item_ID) as Item | undefined;
+  const editItem = (item: Item) => {
+    setSelectedItem(item);
+    seteditModal(true);
+
   }
 
   const [editModal, seteditModal] = React.useState(false);
+
+  const handleSaveItem = async (updatedItem: Partial<Item>) => {
+    if (!selectedItem) return;
+
+    try{
+      let editImageUrl = selectedItem.iImage;
+
+      if (updatedItem.iImage) {
+        await axios.post(
+          'https://06nnzho0si.execute-api.us-east-1.amazonaws.com/delete-item-image/delete-uploaded-image', 
+          { imageUrl: selectedItem.iImage },
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+        console.log('Previous image deleted successfully');
+      }
+
+      const base64Image = await toBase64(updatedItem.iImage);
+        console.log("Base64 Image Data:", base64Image);
+
+        const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+          { base64Image },
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
+
+        const responseData = typeof lambdaResponse.data.body === 'string'
+        ? JSON.parse(lambdaResponse.data.body)
+        : lambdaResponse.data;
+
+        console.log('Lambda response:', lambdaResponse);
+
+        editImageUrl = responseData.imageUrl;
+        if (!editImageUrl) throw new Error("Image upload failed");
+
+        const updatedItemData = { ...selectedItem, ...updatedItem, editImageUrl, };
+
+        console.log('Payload being sent:', updatedItemData);
+
+        await axios.post('https://3vxhbc6r07.execute-api.us-east-1.amazonaws.com/eDit-iTem/eDit-iTem', updatedItemData, {
+          headers: { 'Content-Type': 'application/json' }
+        });
+        alert('Item updated successfully!');
+        fetchItems();
+    } catch (error: any) {
+      console.error('Failed to update item:', error);
+      alert('Failed to update item: ' + error.message);
+    }
+  }
 
 
   const selected_action = (itemId: number, action: string) => {
@@ -453,7 +532,7 @@ const toBase64 = (file: File): Promise<string> =>
           <tbody>
             {items.map((item, index) => (
               <tr key={index}>
-                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><Button variant="outline-secondary" onClick={() => seteditModal(true)} >Edit</Button> <EditItemModal show={editModal} onHide={() => seteditModal(false)}/></td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><Button variant="outline-secondary" onClick={() => editItem(item)} disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen' || item.iStatus === 'archived' || item.iStatus === 'fulfilled' || item.iStatus === 'completed' }>Edit</Button> <EditItemModal show={editModal} onHide={() => seteditModal(false)} item={selectedItem} onSave={(updatedItem) => { handleSaveItem(updatedItem); seteditModal(false); }}/></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
