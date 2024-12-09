@@ -11,7 +11,7 @@ interface Item {
   item_ID: number;
   iName: string;
   iDescription: string;
-  iImage: File;
+  iImage: string | File;
   iStartingPrice: number;
   iStartDate?: string;
   iEndDate?: string;
@@ -396,47 +396,70 @@ const toBase64 = (file: File): Promise<string> =>
 
   const handleSaveItem = async (updatedItem: Partial<Item>) => {
     if (!selectedItem) return;
+    console.log('This is the item to be edited:', selectedItem);
+
+    const { iImage } = selectedItem;
+    console.log('This is the image of the item to be edited:', iImage);
+
+    console
 
     try{
-      let editImageUrl = selectedItem.iImage;
 
-      if (updatedItem.iImage) {
+      if (updatedItem.iImage instanceof File) {
+
+        if (typeof iImage === 'string') {
+          const urlObj = new URL(iImage);
+          const imageKey = urlObj.pathname.substring(1);
+
+          if (!imageKey) {
+            throw new Error('Invalid image URL: Could not extract image key.');
+          }
+        
+
         await axios.post(
           'https://06nnzho0si.execute-api.us-east-1.amazonaws.com/delete-item-image/delete-uploaded-image', 
-          { imageUrl: selectedItem.iImage },
+          { imageKey },
           { headers: { 'Content-Type': 'application/json' } }
         );
-        console.log('Previous image deleted successfully');
-      }
 
-      const base64Image = await toBase64(updatedItem.iImage);
+        console.log('Previous image deleted successfully');}
+
+        const base64Image = await toBase64(updatedItem.iImage);
         console.log("Base64 Image Data:", base64Image);
 
-        const lambdaResponse = await axios.post('https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+        const lambdaResponse = await axios.post(
+          'https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
           { base64Image },
-          {
-            headers: { 'Content-Type': 'application/json' },
-          }
+          { headers: { 'Content-Type': 'application/json' }, }
         );
 
         const responseData = typeof lambdaResponse.data.body === 'string'
-        ? JSON.parse(lambdaResponse.data.body)
-        : lambdaResponse.data;
+          ? JSON.parse(lambdaResponse.data.body)
+          : lambdaResponse.data;
 
         console.log('Lambda response:', lambdaResponse);
 
-        editImageUrl = responseData.imageUrl;
+        const editImageUrl = responseData.imageUrl;
         if (!editImageUrl) throw new Error("Image upload failed");
-
-        const updatedItemData = { ...selectedItem, ...updatedItem, editImageUrl, };
+      
+        const updatedItemData = { 
+          ...selectedItem, 
+          ...updatedItem, 
+          iImage: editImageUrl, 
+        };
 
         console.log('Payload being sent:', updatedItemData);
 
-        await axios.post('https://3vxhbc6r07.execute-api.us-east-1.amazonaws.com/eDit-iTem/eDit-iTem', updatedItemData, {
-          headers: { 'Content-Type': 'application/json' }
-        });
+        await axios.post( 
+          'https://3vxhbc6r07.execute-api.us-east-1.amazonaws.com/eDit-iTem/eDit-iTem', 
+          updatedItemData, 
+          { headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
         alert('Item updated successfully!');
         fetchItems();
+    
     } catch (error: any) {
       console.error('Failed to update item:', error);
       alert('Failed to update item: ' + error.message);
