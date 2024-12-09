@@ -415,7 +415,7 @@ const toBase64 = (file: File): Promise<string> =>
             throw new Error('Invalid image URL: Could not extract image key.');
           }
         
-
+          console.log('This is the image key:', imageKey)
         await axios.post(
           'https://06nnzho0si.execute-api.us-east-1.amazonaws.com/delete-item-image/delete-uploaded-image', 
           { imageKey },
