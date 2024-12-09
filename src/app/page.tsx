@@ -13,6 +13,8 @@ import AdminLogin from './pages/adminLogin';
 import ManageItems from './pages/manageItems';
 import AuctionReport from './pages/auctionReport';
 import BuyerItemDetail from './pages/buyerItemDetail';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import BuyerProfilePage from './pages/buyerProfilePage';
 import SoldItemDetail from './pages/soldItemDetail';
 import ForensicsReport from './pages/forensicsReport';
