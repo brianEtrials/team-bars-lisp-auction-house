@@ -20,7 +20,7 @@ interface Bid {
   bidTimestamp: string;
 }
 
-export default function BuyerItemDetail() {
+export default function SoldItemDetail() {
   const location = useLocation();
   const navigate = useNavigate(); // Initialize navigate
   const item = location.state as Item;
@@ -80,7 +80,7 @@ export default function BuyerItemDetail() {
       <div className="mb-4">
         <button 
           className="btn btn-primary" 
-          onClick={() => navigate("/buyer")} // Navigate to buyerItemsPage
+          onClick={() => navigate("/buyer/soldItems")} // Navigate to buyerItemsPage
         >
           ← Back to Items
         </button>

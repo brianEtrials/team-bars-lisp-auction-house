@@ -8,7 +8,8 @@ import Logout from './logout';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeItemsCount, setActiveItemsCount] = useState(0);
-  const [totalBidsCount, setTotalBidsCount] = useState(0); // New state for total bids count
+  const [totalBidsCount, setTotalBidsCount] = useState(0);
+  const [totalBidsAmount, setTotalBidsAmount] = useState(0);
 
   // Fetch active items count and total bids count on component mount
   useEffect(() => {
@@ -27,9 +28,13 @@ export default function AdminDashboard() {
 
         console.log("Active items count:", data.activeItemsCount);
         console.log("Total bids count:", data.totalBidsCount);
+        console.log("Total funds:", data.totalBidsAmount);
+        console.log("Revenue Earned:", data.revenueEarned);
 
         setActiveItemsCount(data.activeItemsCount);
-        setTotalBidsCount(data.totalBidsCount); // Set total bids count
+        setTotalBidsCount(data.totalBidsCount);
+        setTotalBidsAmount(data.totalBidsAmount);
+        setRevenueEarned(data.revenueEarned);
       } catch (error) {
         console.error('Failed to fetch auction metrics:', error);
       }
@@ -37,6 +42,9 @@ export default function AdminDashboard() {
 
     fetchAuctionMetrics();
   }, []);
+
+  // Add a new state to store the revenue earned
+  const [revenueEarned, setRevenueEarned] = useState(0);
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -47,27 +55,27 @@ export default function AdminDashboard() {
       <h1>Welcome, Admin</h1>
       <div className="admin-actions">
         <button onClick={() => handleNavigate('/manageItems')}>Manage Items</button>
-        <button onClick={() => handleNavigate('/auctionReport')}>Auction Reports</button>
-        <button onClick={() => handleNavigate('/forensicsReport')}>Forensics Reports</button>
+        <button onClick={() => handleNavigate('/auctionReport')}>Auction Report</button>
+        <button onClick={() => handleNavigate('/forensicsReport')}>Forensics Report</button>
       </div>
       <div className="dashboard-performance">
         <h2>Auction House Performance Overview</h2>
         <div className="performance-cards">
           <div className="performance-card">
-            <h3>Total Items Published</h3>
+            <h3>Items Published</h3>
             <p>{activeItemsCount}</p>
           </div>
           <div className="performance-card">
             <h3>Total Bids Placed</h3>
-            <p>{totalBidsCount}</p> {/* Updated to display total bids count */}
+            <p>{totalBidsCount}</p> 
           </div>
           <div className="performance-card">
             <h3>Total Funds</h3>
-            <p>--</p> {/* Placeholder */}
+            <p>{totalBidsAmount} USD</p> 
           </div>
           <div className="performance-card">
             <h3>Revenue Earned</h3>
-            <p>--</p> {/* Placeholder */}
+            <p>{revenueEarned} USD </p> 
           </div>
           <Logout />
         </div>

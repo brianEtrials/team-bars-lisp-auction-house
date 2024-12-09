@@ -77,11 +77,11 @@ export default function Accounts() {
         accountType: accountInfo.accountType
       });
 
-      // Pass account info as state to the BuyerAccountPage
+      // Pass account info as state to the buyer
       const storedCredentials = secureLocalStorage.getItem("userCredentials");
 
       if (accountInfo.accountType === "buyer") {
-        navigate("/buyerAccountPage", { state: storedCredentials }); // Pass state here
+        navigate("/buyer", { state: storedCredentials }); // Pass state here
       } else if (accountInfo.accountType === "seller") {
         navigate("/add_review_items", { state: storedCredentials }); // Navigate to seller account page
       } else {
@@ -122,7 +122,7 @@ export default function Accounts() {
       if(status === 0){
         alert("Account is closed");
       } else if (status === 1 && accountInfo.account_type === "buyer") {
-        navigate("/buyerAccountPage", { state: accountInfo });
+        navigate("/buyer", { state: accountInfo });
       } else if (status === 1 && accountInfo.account_type === "seller") {
         navigate("/add_review_items", { state: accountInfo });
       } else {

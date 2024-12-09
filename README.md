@@ -59,15 +59,13 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
     -Unpublish Item
 
-### Iteration 2: Use Cases (11)
+### Iteration 2: Use Cases (10)
 
   Buyer:
   
     -Close Account
 
-    -Place Bid
-
-    -Review Active Bids
+    -View Item
 
   Seller:
   
@@ -75,7 +73,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
     
     -Request Unfreeze Item
     
-    -Edit Item
+    -Archive Item
 
   Customer:
   
@@ -98,5 +96,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Credentials for login buyer: username:testbuyer, password:test
 - Credentials for login seller: username:testseller, password:test
-- Credentials for login admin: username:admin, password:admin24
-- Item Name should always be unique.
+- Credentials for login admin: username:admin, password:admin24 (login inside 'Sign in' page)
+- Item Name should always be unique
+- The items for testing 'View Item' are Laptop and Smartphone (login with credentials for 'testbuyer')
