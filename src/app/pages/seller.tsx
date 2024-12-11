@@ -14,22 +14,7 @@ interface Item {
   iEndDate?: string;
   iStatus?: string;
   duration?: number;
-  iNumBids?: number;
-}
-
-
-
-
-interface Item {
-  item_ID: number;
-  iName: string;
-  iDescription: string;
-  iImage: File;
-  iStartingPrice: number;
-  iStartDate?: string;
-  iEndDate?: string;
-  iStatus?: string;
-  duration?: number;
+  iType: string;
   iNumBids?: number;
 }
 
@@ -44,7 +29,7 @@ export default function FetchItemsComponent() {
     iImage: '',
     iStartingPrice: '',
     duration: '',
-    type: 'Auction',
+    iType: 'Auction',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [redraw, forceRedraw] = useState(0);
@@ -73,7 +58,6 @@ export default function FetchItemsComponent() {
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debugger;
     setNewItem({ ...newItem, [e.target.name]: e.target.value });
   };
 
@@ -86,10 +70,10 @@ export default function FetchItemsComponent() {
 
 
   const addItem = async () => {
-    const { iName, iDescription, iStartingPrice} = newItem;
+    const { iName, iDescription, iStartingPrice, iType} = newItem;
     console.log("User name data ",usernamedata)
-    if (!iName || !iDescription || !imageFile || !iStartingPrice) {
-      alert('Please fill in all required fields: Item Name, Description, Image URL, and Starting Price.');
+    if (!iName || !iDescription || !imageFile || !iStartingPrice || !iType) {
+      alert('Please fill in all required fields: Item Name, Description, Image URL, Auction Type, and Starting Price.');
       return;
     }
 
@@ -130,7 +114,7 @@ const base64Image = await toBase64(imageFile);
         headers: { 'Content-Type': 'application/json' }
       });
       alert('Item added successfully!');
-      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '', type: ''});
+      setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '', iType: ''});
       setImageFile(null);
       fetchItems();
     } catch (error: any) {
@@ -346,9 +330,9 @@ const toBase64 = (file: File): Promise<string> =>
             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
               <input
                 type="radio"
-                name="type"
+                name="iType"
                 value="Auction"
-                checked={newItem.type === 'Auction'}
+                checked={newItem.iType === "Auction"}
                 onChange={handleInputChange}
               />
               Auction
@@ -356,9 +340,9 @@ const toBase64 = (file: File): Promise<string> =>
             <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
               <input
                 type="radio"
-                name="type"
-                value="Buy Now"
-                checked={newItem.type === 'Buy Now'}
+                name="iType"
+                value="Buy_Now"
+                checked={newItem.iType === "Buy_Now"}
                 onChange={handleInputChange}
               />
               Buy Now
@@ -386,6 +370,7 @@ const toBase64 = (file: File): Promise<string> =>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>End Date</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Status</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Duration</th>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Type</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Action</th>
             </tr>
           </thead>
@@ -401,6 +386,7 @@ const toBase64 = (file: File): Promise<string> =>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iEndDate : ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.duration}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iType}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
                   <select value="Action" onChange={(e) => selected_action(item.item_ID, e.target.value)} style={{ padding: '5px', fontSize: '14px' }}>
                     <option value="Action" disabled>Action</option>
