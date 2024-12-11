@@ -300,7 +300,7 @@ const toBase64 = (file: File): Promise<string> =>
       <Form noValidate validated={validated} onSubmit={handleSubmit} className="needs-validation">
         {/* Item Name */}
         <Form.Group as={Col} md="6" controlId="validationItemName">
-          <Form.Label>Item Name</Form.Label>
+          <Form.Label>Item Name (it has to be unique)</Form.Label>
           <Form.Control required type="text" name="iName" defaultValue={item?.iName} placeholder="Enter item name" />
           <Form.Control.Feedback>Good enough</Form.Control.Feedback>
           <Form.Control.Feedback type="invalid" tooltip>
