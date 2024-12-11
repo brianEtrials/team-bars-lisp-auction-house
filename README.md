@@ -89,6 +89,33 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
     -Unfreeze Item
     
+### Iteration 3: Use Cases (10)
+
+  Buyer:
+  
+    -Search recently sold
+
+    -Sort recently sold
+
+    -Place bid 
+
+    -Review active bids of buyer 
+
+    -Review purchases 
+
+    -Buy Now (new use case) 
+
+  Seller:
+  
+    -Edit Item
+    
+    -Fulfill item
+
+  Admin:
+  
+    -Generate Auction Report
+
+    -Generate Forensics Report
 
 #### Landing Page: http://auctionlisp.s3-website-us-east-1.amazonaws.com
 
