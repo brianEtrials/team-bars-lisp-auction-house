@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
-import logo from  '../../../img/logo.png'
+import { useLocation, useNavigate } from "react-router-dom";
+import logo from '../../../img/logo.png';
 
 interface Item {
   item_ID: number;
@@ -10,6 +10,7 @@ interface Item {
   iStartingPrice: number;
   iStartDate?: string;
   iEndDate?: string;
+  iType: string;
 }
 
 interface Bid {
@@ -22,7 +23,7 @@ interface Bid {
 
 export default function BuyerItemDetail() {
   const location = useLocation();
-  const navigate = useNavigate(); // Initialize navigate
+  const navigate = useNavigate();
   const item = location.state as Item;
 
   const [bids, setBids] = useState<Bid[]>([]);
@@ -30,6 +31,8 @@ export default function BuyerItemDetail() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (item.iType === 'Buy_Now') return; // Skip fetching bids for Buy_Now items
+
     const fetchBids = async () => {
       if (!item.item_ID) {
         setError("Invalid item_ID provided.");
@@ -53,7 +56,6 @@ export default function BuyerItemDetail() {
         }
 
         const responseData = await response.json();
-        console.log("API response data:", responseData);
 
         // Handle stringified body
         if (typeof responseData.body === 'string') {
@@ -70,17 +72,14 @@ export default function BuyerItemDetail() {
     };
 
     fetchBids();
-  }, [item.item_ID]);
-
-  console.log("Bids state after fetching:", bids);
+  }, [item.item_ID, item.iType]);
 
   return (
     <div style={{ padding: '20px' }}>
-      {/* Back Arrow Button */}
       <div className="mb-4">
-        <button 
-          className="btn btn-primary" 
-          onClick={() => navigate("/buyer")} // Navigate to buyerItemsPage
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/buyer")}
         >
           ← Back to Items
         </button>
@@ -108,61 +107,68 @@ export default function BuyerItemDetail() {
         <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
       </div>
 
-      <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Bids</h2>
-      {loading && <p style={{ textAlign: 'center' }}>Loading bids...</p>}
-      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-      {!loading && bids.length === 0 && <p style={{ textAlign: 'center' }}>No bids found for this item.</p>}
-
-      {!loading && bids.length > 0 && (
-        <div style={{ margin: '30px auto', maxWidth: '80%' }}>
-          <table
-            style={{
-              width: '100%',
-              textAlign: 'center',
-              borderCollapse: 'collapse',
-              border: '1px solid #ddd',
-              boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            }}
-          >
-            <thead>
-              <tr style={{ backgroundColor: '#f4f4f4', fontWeight: 'bold' }}>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Bid ID</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Buyer ID</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Amount ($)</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Timestamp</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bids.map((bid) => (
-                <tr key={bid.bid_ID}>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.bid_ID}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.buyer_ID}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.amount}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.bidTimestamp}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      {item.iType !== 'Buy_Now' && (
+        <>
+          <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Bids</h2>
+          {loading && <p style={{ textAlign: 'center' }}>Loading bids...</p>}
+          {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+          <div>
+            {!loading && bids.length === 0 && (
+              <p style={{ textAlign: 'center' }}>No bids found for this item.</p>
+            )}
+          </div>
+          {!loading && bids.length > 0 && (
+            <div style={{ margin: '30px auto', maxWidth: '80%' }}>
+              <table
+                style={{
+                  width: '100%',
+                  textAlign: 'center',
+                  borderCollapse: 'collapse',
+                  border: '1px solid #ddd',
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                }}
+              >
+                <thead>
+                  <tr style={{ backgroundColor: '#f4f4f4', fontWeight: 'bold' }}>
+                    <th style={{ padding: '10px', border: '1px solid #ddd' }}>Bid ID</th>
+                    <th style={{ padding: '10px', border: '1px solid #ddd' }}>Buyer ID</th>
+                    <th style={{ padding: '10px', border: '1px solid #ddd' }}>Amount ($)</th>
+                    <th style={{ padding: '10px', border: '1px solid #ddd' }}>Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {bids.map((bid) => (
+                    <tr key={bid.bid_ID}>
+                      <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.bid_ID}</td>
+                      <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.buyer_ID}</td>
+                      <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.amount}</td>
+                      <td style={{ padding: '10px', border: '1px solid #ddd' }}>{bid.bidTimestamp}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
 
-      {/* BID Button */}
-      <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button
-          style={{
-            backgroundColor: '#cccccc',
-            color: '#fff',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'not-allowed',
-            fontSize: '16px',
-          }}
-          disabled
-        >
-          BID
-        </button>
-      </div>
+      {item.iType === 'Buy_Now' && (
+        <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          <button
+            style={{
+              backgroundColor: 'green',
+              color: 'white',
+              padding: '10px 20px',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontSize: '16px',
+            }}
+          >
+            Buy Now
+          </button>
+        </div>
+      )}
     </div>
   );
 }
