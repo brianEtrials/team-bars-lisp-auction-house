@@ -3,12 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import CloseAccount from './closeaccounts';
 import Logout from './logout';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Button, Col, Form, Modal, Row, InputGroup } from 'react-bootstrap';
+
 
 interface Item {
   item_ID: number;
   iName: string;
   iDescription: string;
-  iImage: File;
+  iImage: string | File;
   iStartingPrice: number;
   iStartDate?: string;
   iEndDate?: string;
@@ -23,6 +26,7 @@ export default function FetchItemsComponent() {
   const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
   const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '' });  // State for seller information
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [newItem, setNewItem] = useState({
     iName: '',
     iDescription: '',
@@ -261,6 +265,213 @@ const toBase64 = (file: File): Promise<string> =>
     }
   };
   
+
+  
+  function EditForm({ item, onSave }: { item: Item | null; onSave: (updatedItem: Partial<Item>) => void }) {
+    const [validated, setValidated] = useState(false);
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const form = event.currentTarget;
+
+      if (form.checkValidity() === false) {
+        setValidated(true);
+        return;
+      }
+
+      setValidated(true);
+
+      const updatedItem: Partial<Item> = {
+        iName: (form.elements.namedItem("iName") as HTMLInputElement).value,
+        iDescription: (form.elements.namedItem("iDescription") as HTMLInputElement).value,
+        iStartingPrice: parseFloat((form.elements.namedItem("iStartingPrice") as HTMLInputElement).value),
+        duration: parseInt((form.elements.namedItem("duration") as HTMLInputElement).value, 10),
+      };
+
+      const imageInput = form.elements.namedItem("iImage") as HTMLInputElement;
+      if (imageInput.files && imageInput.files.length > 0) { 
+        updatedItem.iImage = imageInput.files[0]; 
+      };
+
+      onSave(updatedItem);
+    };
+
+    return (
+      <Form noValidate validated={validated} onSubmit={handleSubmit} className="needs-validation">
+        {/* Item Name */}
+        <Form.Group as={Col} md="6" controlId="validationItemName">
+          <Form.Label>Item Name (it has to be unique)</Form.Label>
+          <Form.Control required type="text" name="iName" defaultValue={item?.iName} placeholder="Enter item name" />
+          <Form.Control.Feedback>Good enough</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid" tooltip>
+           Please provide an item name.
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Description */}
+        <Form.Group as={Col} md="6" controlId="validationDescription">
+          <Form.Label>Description</Form.Label>
+          <Form.Control required type="text" name="iDescription" defaultValue={item?.iDescription} placeholder="Enter item description" />
+          <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid" tooltip>
+            Please provide an item description.
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Image Upload */}
+        <Form.Group as={Col} md="6" controlId="validationImage">
+          <Form.Label>Image</Form.Label>
+          <Form.Control type="file" name="iImage" accept="image/*" />
+          {item?.iImage && (
+            <div style={{ marginTop: '10px', fontStyle: 'italic' }}>
+              Upload a new image to replace the old one, or leave this empty to keep the current image.
+            </div>
+          )}            
+          <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Please provide an item image.
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Starting Price */}
+        <Form.Group as={Col} md="6" controlId="validationStartingPrice">
+          <Form.Label>Starting Price</Form.Label>
+          <Form.Control required type="number" name="iStartingPrice" defaultValue={item?.iStartingPrice} placeholder="Enter starting price" />
+          <Form.Control.Feedback>Good enough</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid" tooltip>
+            Please provide a starting price. (At least 1$)
+          </Form.Control.Feedback>
+        </Form.Group>
+  
+        {/* Duration */}
+        <Form.Group as={Col} md="6" controlId="validationDuration">
+          <Form.Label>Duration (in days)</Form.Label>
+          <Form.Control type="number" name="duration" defaultValue={item?.duration} placeholder="Enter duration in days" />
+          <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+          <Form.Control.Feedback type="invalid">
+            Please provide a valid duration.
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Button variant="primary" type="submit"> Save Changes</Button>
+      </Form>
+    );
+  }
+  
+  
+
+  function EditItemModal({ show, onHide, item, onSave, }: { show: boolean, onHide: () => void, item: Item | null, onSave: (updatedItem: Partial<Item>) => void; }) {
+    return (
+      <Modal
+        show={show} onHide={onHide}
+        size="lg"
+        aria-labelledby="contained-modal-title-vcenter"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title id="contained-modal-title-vcenter">
+            Edit Item
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <EditForm item={item} onSave={(updatedItem) => {
+            onSave({ ...item, ...updatedItem});
+            onHide();
+          }}/>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={onHide}>Abort Mission</Button>
+          {/*<Button variant="primary" onClick={editItem}>Save Changes</Button>*/}
+        </Modal.Footer>
+      </Modal>
+    );
+  }
+
+  const editItem = (item: Item) => {
+    setSelectedItem(item);
+    seteditModal(true);
+
+  }
+
+  const [editModal, seteditModal] = React.useState(false);
+
+  const handleSaveItem = async (updatedItem: Partial<Item>) => {
+    if (!selectedItem) return;
+    console.log('This is the item to be edited:', selectedItem);
+
+    const { iImage } = selectedItem;
+    console.log('This is the image of the item to be edited:', iImage);
+
+    console
+
+    try {
+        let updatedItemData = { ...selectedItem, ...updatedItem };
+    
+        if (updatedItem.iImage instanceof File) {
+            console.log('Handling image upload...');
+    
+            if (typeof iImage === 'string') {
+                const urlObj = new URL(iImage);
+                const imageKey = urlObj.pathname.substring(1);
+    
+                if (!imageKey) {
+                    throw new Error('Invalid image URL: Could not extract image key.');
+                }
+    
+                console.log('This is the image key:', imageKey);
+                await axios.post(
+                    'https://06nnzho0si.execute-api.us-east-1.amazonaws.com/delete-item-image/delete-uploaded-image',
+                    { imageKey },
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+    
+                console.log('Previous image deleted successfully');
+            }
+    
+            const base64Image = await toBase64(updatedItem.iImage);
+            console.log('Base64 Image Data:', base64Image);
+    
+            const lambdaResponse = await axios.post(
+                'https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+                { base64Image },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+    
+            const responseData = typeof lambdaResponse.data.body === 'string'
+                ? JSON.parse(lambdaResponse.data.body)
+                : lambdaResponse.data;
+    
+            console.log('Lambda response:', lambdaResponse);
+    
+            const editImageUrl = responseData.imageUrl;
+            if (!editImageUrl) throw new Error('Image upload failed');
+    
+            // Update the image in the final payload
+            updatedItemData = {
+                ...updatedItemData,
+                iImage: editImageUrl,
+            };
+        }
+    
+        console.log('Payload being sent:', updatedItemData);
+    
+        // Send the final payload to the backend
+        await axios.post(
+            'https://3vxhbc6r07.execute-api.us-east-1.amazonaws.com/eDit-iTem/eDit-iTem',
+            updatedItemData,
+            { headers: { 'Content-Type': 'application/json' } }
+        );
+    
+        alert('Item updated successfully!');
+        fetchItems();
+    } catch (error: any) {
+        console.error('Failed to update item:', error);
+        alert('Failed to update item: ' + error.message);
+    }  
+  }
+
+
   const selected_action = (itemId: number, action: string) => {
     console.log(`Item ID: ${itemId}, Selected Action: ${action}`);
     if (action === 'Remove') {
@@ -361,6 +572,7 @@ const toBase64 = (file: File): Promise<string> =>
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1em', fontFamily: 'Arial, sans-serif' }}>
           <thead>
             <tr>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}></th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item ID</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item Name</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Description</th>
@@ -377,6 +589,7 @@ const toBase64 = (file: File): Promise<string> =>
           <tbody>
             {items.map((item, index) => (
               <tr key={index}>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><Button variant="outline-secondary" onClick={() => editItem(item)} disabled={item.iStatus === 'active' || item.iStatus === 'pending' || item.iStatus === 'frozen' || item.iStatus === 'archived' || item.iStatus === 'fulfilled' || item.iStatus === 'completed' }>Edit</Button> <EditItemModal show={editModal} onHide={() => seteditModal(false)} item={selectedItem} onSave={(updatedItem) => { handleSaveItem(updatedItem); seteditModal(false); }}/></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.item_ID}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
