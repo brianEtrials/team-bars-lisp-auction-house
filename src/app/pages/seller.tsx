@@ -25,7 +25,7 @@ export default function FetchItemsComponent() {
       // routing purpose
   const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
-  const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '' });  // State for seller information
+  const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '', funds: 0 });
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [newItem, setNewItem] = useState({
     iName: '',
@@ -47,7 +47,13 @@ export default function FetchItemsComponent() {
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
       console.log(responseData)
       setItems(responseData.items || []);
-      setSellerInfo(responseData.sellerInfo || {});  // Set seller information
+      setSellerInfo({
+        id: responseData.sellerInfo.id,
+        first_name: responseData.sellerInfo.first_name,
+        last_name: responseData.sellerInfo.last_name,
+        email: responseData.sellerInfo.email,
+        funds: responseData.sellerInfo.funds || 0, // Ensure funds are included
+      });
       forceRedraw(redraw + 1);
     } catch (error) {
       console.error('Failed to fetch items:', error);
@@ -510,6 +516,7 @@ const toBase64 = (file: File): Promise<string> =>
         <h2>Seller Information</h2>
         <p>Name: {sellerInfo.first_name} {sellerInfo.last_name}</p>
         <p>Email: {sellerInfo.email}</p>
+        <p><strong>Funds:</strong> ${sellerInfo.funds.toFixed(2)}</p>
       </div>
       {/* Add item form and items table */}
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>ADD A NEW ITEM</h1>

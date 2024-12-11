@@ -15,12 +15,29 @@ interface BuyerData {
     funds?: string;
 }
 
+interface ItemBidsView {
+    item_ID: number;         // ID of the item
+    iName: string;           // Name of the item
+    iEndDate: string;    // Description of the item
+    amount: number;          // Bid amount
+    bidDate: string;         // Bid timestamp in YYYY-MM-DD format
+    Winning: string;        // True if bidStatus is 1, False otherwise
+  }
+  
+
 export default function BuyerProfilePage() {
     const location = useLocation();
     const navigate = useNavigate(); // Initialize navigate
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const usernamedata = location.state?.username;
+
+    const [buyerData, setbuyerData] = useState<BuyerData>({});
+
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [bids, setBids] = useState<ItemBidsView[]>([]);
+
 
     const fetchFunds = async () => {
         try {
@@ -35,6 +52,8 @@ export default function BuyerProfilePage() {
                     ? JSON.parse(response.data.body)
                     : response.data;
             setdata(responseData);
+            
+            
         } catch (error) {
             console.error('Failed to fetch funds:', error);
             alert('Failed to fetch funds');
@@ -66,8 +85,52 @@ export default function BuyerProfilePage() {
         }
     };
 
+    const fetchActiveBids = async () => {
+
+        setLoading(true); //what is this??
+
+        console.log("getdata.id check",getdata?.id) // not workin.
+        console.log("username check",usernamedata) // working
+
+        try {
+            console.log("username check",usernamedata)
+            const response = await fetch(
+                'https://bprkevlvae.execute-api.us-east-1.amazonaws.com/review-active-bids/review-active-bids',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username: usernamedata }),
+                });
+            
+            console.log("username check",usernamedata)
+
+            const responseData = await response.json();
+
+            console.log("API response data:", responseData);
+
+            if (typeof responseData.body === 'string') {
+                const parsedBody = JSON.parse(responseData.body);
+                setBids(parsedBody.biddata?.bids || []);
+            } else {
+                setBids(responseData.biddata?.bids || []);
+            }
+            console.log("username check",usernamedata)
+
+        } catch (error: any) {
+            setError(error.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+
+
+
     useEffect(() => {
         fetchFunds();
+        fetchActiveBids();
     }, []);
 
     return (
@@ -111,8 +174,41 @@ export default function BuyerProfilePage() {
                     </button>
                 </div>
             </div>
+            <h3>Active Bids</h3>
+            {loading ? (
+                <p>Loading bids...</p>
+            ) : error ? (
+                <p style={{ color: 'red' }}>{error}</p>
+            ) : bids.length > 0 ? (
+                <table className="table table-bordered mt-4">
+                    <thead>
+                        <tr>
+                            <th>Item ID</th>
+                            <th>Item Name</th>
+                            <th>Auction End Date</th>
+                            <th>Bid Amount</th>
+                            <th>Bid Date</th>
+                            <th>Winning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {bids.map((bid, index) => (
+                            <tr key={index}>
+                                <td>{bid.item_ID}</td>
+                                <td>{bid.iName}</td>
+                                <td>{bid.iEndDate}</td>
+                                <td>${bid.amount}</td>
+                                <td>{bid.bidDate}</td>
+                                <td>{bid.Winning}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>No active bids found.</p>
+            )}
 
-            {/* Close Account Section */}
+                    {/* Close Account Section */}
             <div className="card mt-4 p-4">
                 <div style={{ width: '200px'}}>
                     <CloseAccount id={getdata?.id} />
