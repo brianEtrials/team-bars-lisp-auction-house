@@ -379,7 +379,7 @@ const toBase64 = (file: File): Promise<string> =>
           }}/>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>Close</Button>
+          <Button variant="secondary" onClick={onHide}>Abort Mission</Button>
           {/*<Button variant="primary" onClick={editItem}>Save Changes</Button>*/}
         </Modal.Footer>
       </Modal>
