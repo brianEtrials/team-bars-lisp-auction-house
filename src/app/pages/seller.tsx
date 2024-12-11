@@ -24,7 +24,7 @@ export default function FetchItemsComponent() {
       // routing purpose
   const location = useLocation();
   const [items, setItems] = useState<Item[]>([]);
-  const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '' });  // State for seller information
+  const [sellerInfo, setSellerInfo] = useState({ id: 0, first_name: '', last_name: '', email: '', funds: 0 });
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [newItem, setNewItem] = useState({
     iName: '',
@@ -45,7 +45,13 @@ export default function FetchItemsComponent() {
       const responseData = typeof response.data.body === 'string' ? JSON.parse(response.data.body) : response.data;
       console.log(responseData)
       setItems(responseData.items || []);
-      setSellerInfo(responseData.sellerInfo || {});  // Set seller information
+      setSellerInfo({
+        id: responseData.sellerInfo.id,
+        first_name: responseData.sellerInfo.first_name,
+        last_name: responseData.sellerInfo.last_name,
+        email: responseData.sellerInfo.email,
+        funds: responseData.sellerInfo.funds || 0, // Ensure funds are included
+      });
       forceRedraw(redraw + 1);
     } catch (error) {
       console.error('Failed to fetch items:', error);
@@ -275,8 +281,8 @@ const toBase64 = (file: File): Promise<string> =>
       const form = event.currentTarget;
 
       if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
+        setValidated(true);
+        return;
       }
 
       setValidated(true);
@@ -297,13 +303,13 @@ const toBase64 = (file: File): Promise<string> =>
     };
 
     return (
-      <Form noValidate validated={validated} onSubmit={handleSubmit}>
+      <Form noValidate validated={validated} onSubmit={handleSubmit} className="needs-validation">
         {/* Item Name */}
         <Form.Group as={Col} md="6" controlId="validationItemName">
-          <Form.Label>Item Name</Form.Label>
+          <Form.Label>Item Name (it has to be unique)</Form.Label>
           <Form.Control required type="text" name="iName" defaultValue={item?.iName} placeholder="Enter item name" />
           <Form.Control.Feedback>Good enough</Form.Control.Feedback>
-          <Form.Control.Feedback type="invalid">
+          <Form.Control.Feedback type="invalid" tooltip>
            Please provide an item name.
           </Form.Control.Feedback>
         </Form.Group>
@@ -313,7 +319,7 @@ const toBase64 = (file: File): Promise<string> =>
           <Form.Label>Description</Form.Label>
           <Form.Control required type="text" name="iDescription" defaultValue={item?.iDescription} placeholder="Enter item description" />
           <Form.Control.Feedback>Good enough.</Form.Control.Feedback>
-          <Form.Control.Feedback type="invalid">
+          <Form.Control.Feedback type="invalid" tooltip>
             Please provide an item description.
           </Form.Control.Feedback>
         </Form.Group>
@@ -338,7 +344,7 @@ const toBase64 = (file: File): Promise<string> =>
           <Form.Label>Starting Price</Form.Label>
           <Form.Control required type="number" name="iStartingPrice" defaultValue={item?.iStartingPrice} placeholder="Enter starting price" />
           <Form.Control.Feedback>Good enough</Form.Control.Feedback>
-          <Form.Control.Feedback type="invalid">
+          <Form.Control.Feedback type="invalid" tooltip>
             Please provide a starting price. (At least 1$)
           </Form.Control.Feedback>
         </Form.Group>
@@ -379,7 +385,7 @@ const toBase64 = (file: File): Promise<string> =>
           }}/>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide}>Close</Button>
+          <Button variant="secondary" onClick={onHide}>Abort Mission</Button>
           {/*<Button variant="primary" onClick={editItem}>Save Changes</Button>*/}
         </Modal.Footer>
       </Modal>
@@ -403,67 +409,70 @@ const toBase64 = (file: File): Promise<string> =>
 
     console
 
-    try{
-
-      if (updatedItem.iImage instanceof File) {
-
-        if (typeof iImage === 'string') {
-          const urlObj = new URL(iImage);
-          const imageKey = urlObj.pathname.substring(1);
-
-          if (!imageKey) {
-            throw new Error('Invalid image URL: Could not extract image key.');
-          }
-        
-          console.log('This is the image key:', imageKey)
-        await axios.post(
-          'https://06nnzho0si.execute-api.us-east-1.amazonaws.com/delete-item-image/delete-uploaded-image', 
-          { imageKey },
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-
-        console.log('Previous image deleted successfully');}
-
-        const base64Image = await toBase64(updatedItem.iImage);
-        console.log("Base64 Image Data:", base64Image);
-
-        const lambdaResponse = await axios.post(
-          'https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
-          { base64Image },
-          { headers: { 'Content-Type': 'application/json' }, }
-        );
-
-        const responseData = typeof lambdaResponse.data.body === 'string'
-          ? JSON.parse(lambdaResponse.data.body)
-          : lambdaResponse.data;
-
-        console.log('Lambda response:', lambdaResponse);
-
-        const editImageUrl = responseData.imageUrl;
-        if (!editImageUrl) throw new Error("Image upload failed");
-      
-        const updatedItemData = { 
-          ...selectedItem, 
-          ...updatedItem, 
-          iImage: editImageUrl, 
-        };
-
+    try {
+        let updatedItemData = { ...selectedItem, ...updatedItem };
+    
+        if (updatedItem.iImage instanceof File) {
+            console.log('Handling image upload...');
+    
+            if (typeof iImage === 'string') {
+                const urlObj = new URL(iImage);
+                const imageKey = urlObj.pathname.substring(1);
+    
+                if (!imageKey) {
+                    throw new Error('Invalid image URL: Could not extract image key.');
+                }
+    
+                console.log('This is the image key:', imageKey);
+                await axios.post(
+                    'https://06nnzho0si.execute-api.us-east-1.amazonaws.com/delete-item-image/delete-uploaded-image',
+                    { imageKey },
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+    
+                console.log('Previous image deleted successfully');
+            }
+    
+            const base64Image = await toBase64(updatedItem.iImage);
+            console.log('Base64 Image Data:', base64Image);
+    
+            const lambdaResponse = await axios.post(
+                'https://7q6rjwey4m.execute-api.us-east-1.amazonaws.com/upload-image/upload-image',
+                { base64Image },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+    
+            const responseData = typeof lambdaResponse.data.body === 'string'
+                ? JSON.parse(lambdaResponse.data.body)
+                : lambdaResponse.data;
+    
+            console.log('Lambda response:', lambdaResponse);
+    
+            const editImageUrl = responseData.imageUrl;
+            if (!editImageUrl) throw new Error('Image upload failed');
+    
+            // Update the image in the final payload
+            updatedItemData = {
+                ...updatedItemData,
+                iImage: editImageUrl,
+            };
+        }
+    
         console.log('Payload being sent:', updatedItemData);
-
-        await axios.post( 
-          'https://3vxhbc6r07.execute-api.us-east-1.amazonaws.com/eDit-iTem/eDit-iTem', 
-          updatedItemData, 
-          { headers: { 'Content-Type': 'application/json' } }
+    
+        // Send the final payload to the backend
+        await axios.post(
+            'https://3vxhbc6r07.execute-api.us-east-1.amazonaws.com/eDit-iTem/eDit-iTem',
+            updatedItemData,
+            { headers: { 'Content-Type': 'application/json' } }
         );
-      }
-
+    
         alert('Item updated successfully!');
         fetchItems();
-    
     } catch (error: any) {
-      console.error('Failed to update item:', error);
-      alert('Failed to update item: ' + error.message);
-    }
+        console.error('Failed to update item:', error);
+        alert('Failed to update item: ' + error.message);
+    }  
   }
 
 
@@ -505,6 +514,7 @@ const toBase64 = (file: File): Promise<string> =>
         <h2>Seller Information</h2>
         <p>Name: {sellerInfo.first_name} {sellerInfo.last_name}</p>
         <p>Email: {sellerInfo.email}</p>
+        <p><strong>Funds:</strong> ${sellerInfo.funds.toFixed(2)}</p>
       </div>
       {/* Add item form and items table */}
       <h1 style={{ textAlign: 'center', marginBottom: '20px' }}>ADD A NEW ITEM</h1>
