@@ -98,26 +98,29 @@ export default function BuyerItemDetail() {
   const biditem = async () => {
     const amountToAdd = parseFloat(inputValue);
     console.log("bid amount : ",amountToAdd)
+
     const item_ID = item.item_ID
+
     console.log("username : ", usernamedata)
     console.log("item Id : ",item_ID)
+
     if (!isNaN(amountToAdd)) {
         try {
-            await axios.post(
+            const response = await axios.post(
                 'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
                 { usernamedata,item_ID,funds: amountToAdd }
             );
-            
-            //console.log("response.data.data.statusCode: ", response.data.data.statusCode)
+             console.log("response: ", response)
+              console.log("response.data.body: ", response.data.body)
             //console.log("response.status: ", response.status)
-
-            //if (response.status === 200) {
+              const alertMessage = JSON.parse(response.data.body)
+           // if (response.data.statusCode === 200) {
               setInputValue('');
-              alert('Bid made successfully!');
+              alert(alertMessage.message);
               fetchBids();
-            //} else {
-             // console.error("Unexpected response:", response);
-            //}
+           // } else {
+            //  console.error("Unexpected response:", response);
+//}
 
         } catch (error: any) {
             console.error('Failed to update bid:', error);
@@ -140,6 +143,10 @@ export default function BuyerItemDetail() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
 };
+
+const minBid = (highestBid !== null && highestBid > 0)
+  ? highestBid + 1
+  : item.iStartingPrice + 1;
 
 
 
@@ -233,7 +240,7 @@ export default function BuyerItemDetail() {
           onChange={handleInputChange}
           placeholder="Enter amount. (To enter amount use the tiny up 'n' down arrows on the far right or mouse wheel.)"
           className="form-control"
-          min={highestBid !== null ? highestBid + 1 : item.iStartingPrice + 1}
+          min={minBid}
           step='1'
           onKeyDown={(e) => e.preventDefault()}
       />
@@ -242,7 +249,7 @@ export default function BuyerItemDetail() {
             onClick={biditem}
             disabled={
               isNaN(parseFloat(inputValue)) ||
-              parseFloat(inputValue) < (highestBid !== null && highestBid > 0 ? highestBid + 1 : item.iStartingPrice + 1)
+              parseFloat(inputValue) < minBid
             }
         >BID
           </button>
