@@ -108,7 +108,7 @@ export default function BuyerItemDetail() {
                 { usernamedata,item_ID,funds: amountToAdd }
             );
             
-            console.log("response.data.data.statusCode: ", response.data.data.statusCode)
+            //console.log("response.data.data.statusCode: ", response.data.data.statusCode)
             console.log("response.status: ", response.status)
 
             if (response.status === 200) {
