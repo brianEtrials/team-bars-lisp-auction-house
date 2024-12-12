@@ -1,6 +1,10 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
 import logo from  '../../../img/logo.png'
+import axios from 'axios';
+
 
 interface Item {
   item_ID: number;
@@ -24,55 +28,118 @@ export default function BuyerItemDetail() {
   const location = useLocation();
   const navigate = useNavigate(); // Initialize navigate
   const item = location.state as Item;
-
+  const usernamedata = location.state?.loggedInUsername;
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
 
+  const [highestBid, setHighestBid] = useState<number | null>(null);
+
+  console.log("location: ", location)
+  console.log("location.state: ", location.state)
+  console.log("location.state?.username: " , location.state?.username)
+  console.log("usernamedata: ", usernamedata)
+
+  const fetchBids = async () => {
+    if (!item.item_ID) {
+      setError("Invalid item_ID provided.");
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await fetch(
+        `https://5brq4rlzdh.execute-api.us-east-1.amazonaws.com/read-item-bids/read-item-bids`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ item_ID: item.item_ID }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch bids: ${response.statusText}`);
+      }
+
+      const responseData = await response.json();
+      console.log("API response data:", responseData);
+
+      // Handle stringified body
+      let parsedBids = [];
+      if (typeof responseData.body === 'string') {
+        const parsedBody = JSON.parse(responseData.body);
+        setBids(parsedBody.biddata?.bids || []);
+        parsedBids = parsedBody.biddata?.bids || [];
+      } else {
+        setBids(responseData.biddata?.bids || []);
+        parsedBids = responseData.biddata?.bids || [];
+      }
+
+      const maxBid = parsedBids.reduce((max: number, bid: Bid) => Math.max(max, bid.amount), 0);
+      setHighestBid(maxBid);
+
+
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+ 
   useEffect(() => {
-    const fetchBids = async () => {
-      if (!item.item_ID) {
-        setError("Invalid item_ID provided.");
-        setLoading(false);
-        return;
-      }
-      try {
-        const response = await fetch(
-          `https://5brq4rlzdh.execute-api.us-east-1.amazonaws.com/read-item-bids/read-item-bids`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ item_ID: item.item_ID }),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch bids: ${response.statusText}`);
-        }
-
-        const responseData = await response.json();
-        console.log("API response data:", responseData);
-
-        // Handle stringified body
-        if (typeof responseData.body === 'string') {
-          const parsedBody = JSON.parse(responseData.body);
-          setBids(parsedBody.biddata?.bids || []);
-        } else {
-          setBids(responseData.biddata?.bids || []);
-        }
-      } catch (error: any) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBids();
   }, [item.item_ID]);
-
+  
   console.log("Bids state after fetching:", bids);
+
+
+  const biditem = async () => {
+    const amountToAdd = parseFloat(inputValue);
+    console.log("bid amount : ",amountToAdd)
+    const item_ID = item.item_ID
+    console.log("username : ", usernamedata)
+    console.log("item Id : ",item_ID)
+    if (!isNaN(amountToAdd)) {
+        try {
+            const response = await axios.post(
+                'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
+                { usernamedata,item_ID,funds: amountToAdd }
+            );
+            
+            console.log("response.data.data.statusCode: ", response.data.data.statusCode)
+            console.log("response.status: ", response.status)
+
+            if (response.status === 200) {
+              setInputValue('');
+              alert('Bid made successfully!');
+              fetchBids();
+            } else {
+              console.error("Unexpected response:", response);
+            }
+
+        } catch (error: any) {
+            if (error.response) {
+              console.error("Server responded with an error:", error.response);
+              const errorMessage = JSON.parse(error.response.data.body)?.message || "An error occurred.";
+              alert(errorMessage);
+            } else {
+              console.error("Error making the request:", error);
+              alert("Failed to place bid. Please check your connection and try again.");
+            }
+        }
+    } else {
+        alert('Please enter a valid number.');
+    }
+    
+};
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+};
+
+
 
   return (
     <div style={{ padding: '20px' }}>
@@ -148,20 +215,35 @@ export default function BuyerItemDetail() {
 
       {/* BID Button */}
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
+          {/* // style={{
+          //   backgroundColor: '#cccccc',
+          //   color: '#fff',
+          //   padding: '10px 20px',
+          //   border: 'none',
+          //   borderRadius: '5px',
+          //   cursor: 'not-allowed',
+          //   fontSize: '16px',
+          // }} */}
+        
+        <input
+          type="number"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Enter amount. (To enter amount use the tiny up 'n' down arrows on the far right or mouse wheel.)"
+          className="form-control"
+          min={highestBid !== null ? highestBid + 1 : item.iStartingPrice + 1}
+          step='1'
+          onKeyDown={(e) => e.preventDefault()}
+      />
         <button
-          style={{
-            backgroundColor: '#cccccc',
-            color: '#fff',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'not-allowed',
-            fontSize: '16px',
-          }}
-          disabled
-        >
-          BID
-        </button>
+            className="btn btn-primary mt-2"
+            onClick={biditem}
+            disabled={
+              isNaN(parseFloat(inputValue)) ||
+              parseFloat(inputValue) < (highestBid !== null && highestBid > 0 ? highestBid + 1 : item.iStartingPrice + 1)
+            }
+        >BID
+          </button>
       </div>
     </div>
   );

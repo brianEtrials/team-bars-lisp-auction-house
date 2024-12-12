@@ -56,8 +56,26 @@ export default function BuyerItemsPage() {
     }, []);
 
     const viewItemDetails = (selectedItem: Item) => {
-        navigate("/buyerItemDetail", { state: { ...selectedItem } });
-    };
+      const storedCredentials = secureLocalStorage.getItem("userCredentials");
+      if (storedCredentials) {
+        let parsedCredentials;
+
+        if (typeof storedCredentials === 'string') {
+          try {
+            parsedCredentials = JSON.parse(storedCredentials);
+          } catch (error) {
+            console.error("Failed to parse user credentials:", error);
+            alert("Failed to retrieve user information. Please log in again.");
+            return;
+          }
+        } else {
+          parsedCredentials = storedCredentials
+        }
+
+        const loggedInUsername = parsedCredentials?.username;
+
+        navigate("/buyerItemDetail", { state: { ...selectedItem, loggedInUsername } });
+    }};
 
     const goToProfile = () => {
         // Retrieve the stored user credentials
