@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from '../../../img/logo.png';
 import secureLocalStorage from 'react-secure-storage';
+import axios from 'axios';
 
 interface Item {
   item_ID: number;
@@ -159,19 +160,49 @@ export default function BuyerItemDetail() {
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <button
             style={{
-              backgroundColor: 'green',
+              backgroundColor: accountInfo?.funds >= item.iStartingPrice ? 'green' : 'gray',
               color: 'white',
               padding: '10px 20px',
               border: 'none',
               borderRadius: '5px',
-              cursor: 'pointer',
+              cursor: accountInfo?.funds >= item.iStartingPrice ? 'pointer' : 'not-allowed',
               fontSize: '16px',
             }}
+            onClick={async () => {
+              debugger;
+              if (accountInfo?.funds >= item.iStartingPrice) {
+                try {
+                  const purchaseItem = async () => {
+                    const item_ID = item.item_ID; // Adjusted to use item.item_ID
+                    const usernamedata = accountInfo.username; // Ensure accountInfo contains username
+
+                    console.log("Username:", usernamedata);
+                    console.log("Item ID:", item_ID);
+
+                    // Call the API
+                    await axios.post(
+                      'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
+                      { usernamedata, item_ID, funds: item.iStartingPrice }
+                    );
+                  };
+
+                  await purchaseItem(); // Execute the purchase logic
+                  alert('Purchase made successfully!');
+                } catch (error: any) {
+                  console.error('Failed to update funds:', error);
+                  alert('Failed to update funds. ' + error.message);
+                }
+              } else {
+                alert("Insufficient funds to purchase this item.");
+              }
+            }}
+            disabled={accountInfo?.funds < item.iStartingPrice} // Disable button if funds are insufficient
           >
             Buy Now
           </button>
         </div>
       )}
+
     </div>
   );
 }

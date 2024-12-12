@@ -285,9 +285,7 @@ const toBase64 = (file: File): Promise<string> =>
       alert('Failed to update item status to archived: ' + (error.response ? error.response.data.message : error.message));
     }
   };
-  
 
-  
   function EditForm({ item, onSave }: { item: Item | null; onSave: (updatedItem: Partial<Item>) => void }) {
     const [validated, setValidated] = useState(false);
 
