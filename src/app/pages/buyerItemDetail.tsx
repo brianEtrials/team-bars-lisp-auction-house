@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import logo from '../../../img/logo.png';
+import secureLocalStorage from 'react-secure-storage';
 
 interface Item {
   item_ID: number;
@@ -25,7 +26,9 @@ export default function BuyerItemDetail() {
   const location = useLocation();
   const navigate = useNavigate();
   const item = location.state as Item;
-
+  const [accountInfo, setAccountInfo] = useState(() => {
+    return secureLocalStorage.getItem("userCredentials");
+  });
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
