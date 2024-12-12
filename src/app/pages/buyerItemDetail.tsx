@@ -103,32 +103,34 @@ export default function BuyerItemDetail() {
     console.log("item Id : ",item_ID)
     if (!isNaN(amountToAdd)) {
         try {
-            const response = await axios.post(
+            await axios.post(
                 'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
                 { usernamedata,item_ID,funds: amountToAdd }
             );
             
             //console.log("response.data.data.statusCode: ", response.data.data.statusCode)
-            console.log("response.status: ", response.status)
+            //console.log("response.status: ", response.status)
 
-            if (response.status === 200) {
+            //if (response.status === 200) {
               setInputValue('');
               alert('Bid made successfully!');
               fetchBids();
-            } else {
-              console.error("Unexpected response:", response);
-            }
+            //} else {
+             // console.error("Unexpected response:", response);
+            //}
 
         } catch (error: any) {
-            if (error.response) {
-              console.error("Server responded with an error:", error.response);
-              const errorMessage = JSON.parse(error.response.data.body)?.message || "An error occurred.";
-              alert(errorMessage);
-            } else {
-              console.error("Error making the request:", error);
-              alert("Failed to place bid. Please check your connection and try again.");
+            console.error('Failed to update bid:', error);
+            alert('Failed to update funds. ' + error.message);
+            //if (error.response) {
+              //console.error("Server responded with an error:", error.response);
+              //const errorMessage = JSON.parse(error.response.data.body)?.message || "An error occurred.";
+             // alert(errorMessage);
+            //} else {
+             // console.error("Error making the request:", error);
+              //alert("Failed to place bid. Please check your connection and try again.");
             }
-        }
+        
     } else {
         alert('Please enter a valid number.');
     }
