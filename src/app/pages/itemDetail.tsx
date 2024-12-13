@@ -13,6 +13,7 @@ interface Item {
   iStartingPrice: number;
   iStartDate?: string;
   iEndDate?: string;
+  iType?: string;
 }
 
 export default function ItemDetail() {
@@ -23,6 +24,7 @@ export default function ItemDetail() {
     const iStartingPrice = location.state.iStartingPrice; //as string;
     const iStartDate = location.state.iStartDate; //as string;
     const iEndDate = location.state.iEndDate; //as string;
+    const iType = location.state.iType;
 
     console.log("state received from customer page : ", itemName)
 
@@ -42,6 +44,7 @@ export default function ItemDetail() {
           <p><strong>Starting Price:</strong> ${iStartingPrice}</p>
           <p><strong>Start Date:</strong> {iStartDate || 'N/A'}</p>
           <p><strong>End Date:</strong> {iEndDate || 'N/A'}</p>
+          <p><strong>Type:</strong> {iType || 'N/A'}</p>
         </div>
       );
 }

@@ -8,6 +8,7 @@ interface Item {
   iName: string;
   seller_id: number;
   iStatus: string;
+  iType: string;
 }
 
 export default function ManageItems() {
@@ -93,6 +94,7 @@ export default function ManageItems() {
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Seller</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Status</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Actions</th>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Type</th>
             </tr>
           </thead>
           <tbody>
@@ -102,6 +104,7 @@ export default function ManageItems() {
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iName}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.seller_id}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iType}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>
                   <button
                     className="action-button"

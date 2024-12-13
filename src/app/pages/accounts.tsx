@@ -74,7 +74,8 @@ export default function Accounts() {
       secureLocalStorage.setItem("userCredentials", {
         id: accountId,
         username: accountInfo.username,
-        accountType: accountInfo.accountType
+        accountType: accountInfo.accountType,
+        funds: accountInfo.funds, // Include funds here
       });
 
       // Pass account info as state to the buyer
@@ -117,6 +118,7 @@ export default function Accounts() {
       secureLocalStorage.setItem("userCredentials", {
         username: accountInfo.username,
         account_type: accountInfo.account_type,
+        funds: accountInfo.funds, // Include funds here
       });
       let status = accountInfo.status; 
       if(status === 0){
