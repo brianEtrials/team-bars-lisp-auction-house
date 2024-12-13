@@ -29,7 +29,7 @@ export default function BuyerItemDetail() {
   const navigate = useNavigate();
   const item = location.state as Item;
   const [accountInfo, setAccountInfo] = useState(() => {
-    return secureLocalStorage.getItem("userCredentials");
+    return secureLocalStorage.getItem("userCredentials") as { username: string; funds: number } | null;
   });
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -207,12 +207,15 @@ export default function BuyerItemDetail() {
                   alert('Item purchased successfully!');
                   navigate("/");
                 } catch (error) {
-                  console.error('Failed to complete the item:', error.response || error.message);
-                  alert('Failed to complete the purchase. Please try again.');
+                  const err = error as Error;
+                  console.error('Failed to complete the item:', err.message);
                 }
               } catch (error) {
-                console.error('Failed to place the bid:', error.response || error.message);
-                alert('Failed to place the bid. Please try again.');
+                if (error instanceof Error) {
+                  console.error('Failed to complete the item:', error.message);
+                } else {
+                  console.error('An unknown error occurred.');
+                }
               }
             }}
           >
