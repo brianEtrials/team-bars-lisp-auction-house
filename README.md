@@ -125,5 +125,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Credentials for login seller: username:testseller, password:test
 - Credentials for login admin: username:admin, password:admin24 (login inside 'Sign in' page)
 - Item Name should always be unique
-- The items for testing 'View Item' are Laptop and Smartphone (login with credentials for 'testbuyer')
 - Price Range: enter i.e. '1 to 10' in the search field
