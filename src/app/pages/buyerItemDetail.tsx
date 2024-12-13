@@ -13,6 +13,7 @@ interface Item {
   iStartDate?: string;
   iEndDate?: string;
   iType: string;
+  iStatus: string;
 }
 
 interface Bid {
@@ -169,40 +170,53 @@ export default function BuyerItemDetail() {
               fontSize: '16px',
             }}
             onClick={async () => {
-              debugger;
               if (accountInfo?.funds >= item.iStartingPrice) {
                 try {
                   const purchaseItem = async () => {
-                    const item_ID = item.item_ID; // Adjusted to use item.item_ID
-                    const usernamedata = accountInfo.username; // Ensure accountInfo contains username
-
+                    const item_ID = item.item_ID;
+                    const usernamedata = accountInfo.username;
+            
                     console.log("Username:", usernamedata);
                     console.log("Item ID:", item_ID);
-
-                    // Call the API
+            
+                    // Call the purchase API
                     await axios.post(
                       'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
                       { usernamedata, item_ID, funds: item.iStartingPrice }
                     );
+                    debugger;
+                    try {
+                      await axios.post( 'https://vtxxpfss2e.execute-api.us-east-1.amazonaws.com/buynow/buynow', { item_ID }, {
+                          headers: { 'Content-Type': 'application/json' },
+                        }
+                      );
+                      alert('Item completed successfully!');
+                    } catch (error: any) {
+                      console.error('Failed to complete item:', error.response || error.message);
+                      alert(
+                        'Failed to complete item: ' +
+                          (error.response ? error.response.data.message : error.message)
+                      );
+                    }
                   };
-
-                  await purchaseItem(); // Execute the purchase logic
+            
+                  await purchaseItem();
                   alert('Purchase made successfully!');
                 } catch (error: any) {
-                  console.error('Failed to update funds:', error);
-                  alert('Failed to update funds. ' + error.message);
+                  console.error('Failed to update funds or item status:', error);
+                  alert('Failed to update funds or item status. ' + error.message);
                 }
               } else {
                 alert("Insufficient funds to purchase this item.");
               }
             }}
+            
             disabled={accountInfo?.funds < item.iStartingPrice} // Disable button if funds are insufficient
           >
             Buy Now
           </button>
         </div>
       )}
-
     </div>
   );
 }
