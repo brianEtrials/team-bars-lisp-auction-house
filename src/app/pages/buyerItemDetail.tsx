@@ -216,7 +216,7 @@ export default function BuyerItemDetail() {
               }
             }}
           >
-            Buy Now
+            {item.iType === "Buy_Now" ? "Buy" : "Place Bid"}
           </button>
         </div>
       )}
