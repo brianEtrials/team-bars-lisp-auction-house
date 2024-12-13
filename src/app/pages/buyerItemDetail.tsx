@@ -184,9 +184,8 @@ export default function BuyerItemDetail() {
                       'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
                       { usernamedata, item_ID, funds: item.iStartingPrice }
                     );
-                    debugger;
                     try {
-                      await axios.post( 'https://vtxxpfss2e.execute-api.us-east-1.amazonaws.com/buynow/buynow', { item_ID }, {
+                      await axios.post( 'https://ib158fhn7a.execute-api.us-east-1.amazonaws.com/buynow/buynow', { item_ID }, {
                           headers: { 'Content-Type': 'application/json' },
                         }
                       );
@@ -210,7 +209,6 @@ export default function BuyerItemDetail() {
                 alert("Insufficient funds to purchase this item.");
               }
             }}
-            
             disabled={accountInfo?.funds < item.iStartingPrice} // Disable button if funds are insufficient
           >
             Buy Now
