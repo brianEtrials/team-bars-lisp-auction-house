@@ -114,8 +114,8 @@ export default function Accounts() {
       );
       // Lambda returns response as JSON string - might want to change
       const accountInfo = typeof response.data.body === "string" ? JSON.parse(response.data.body) : response.data.body;
-
       secureLocalStorage.setItem("userCredentials", {
+        id: accountInfo.idaccounts,
         username: accountInfo.username,
         account_type: accountInfo.account_type,
         funds: accountInfo.funds, // Include funds here

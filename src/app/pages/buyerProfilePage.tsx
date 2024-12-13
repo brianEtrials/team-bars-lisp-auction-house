@@ -5,7 +5,8 @@ import axios from 'axios';
 import CloseAccount from './closeaccounts';
 import Logout from './logout';
 import { useLocation, useNavigate } from 'react-router-dom'; // Import useNavigate
-import logo from  '../../../img/logo.png'
+import logo from  '../../../img/logo.png';
+import secureLocalStorage from 'react-secure-storage';
 
 interface BuyerData {
     id?: number;
@@ -18,12 +19,20 @@ interface BuyerData {
 interface ItemBidsView {
     item_ID: number;         // ID of the item
     iName: string;           // Name of the item
-    iEndDate: string;    // Description of the item
+    iEndDate: string;        // Description of the item
     amount: number;          // Bid amount
     bidDate: string;         // Bid timestamp in YYYY-MM-DD format
-    Winning: string;        // True if bidStatus is 1, False otherwise
-  }
-  
+    Winning: string;         // True if bidStatus is 1, False otherwise
+}
+
+interface PreviousPurchases {
+    transaction_id: number;
+    seller_id: number;
+    buyer_id: number;
+    item_id: number;
+    amount: number;
+    transaction_time: string; // Use `string` for ISO date-time format
+}
 
 export default function BuyerProfilePage() {
     const location = useLocation();
@@ -32,13 +41,13 @@ export default function BuyerProfilePage() {
     const [inputValue, setInputValue] = useState('');
     const usernamedata = location.state?.username;
 
-    const [buyerData, setbuyerData] = useState<BuyerData>({});
-
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [bids, setBids] = useState<ItemBidsView[]>([]);
+    const [previousPurchases, setPreviousPurchases] = useState<PreviousPurchases[]>([]);
+    const [loadingPurchases, setLoadingPurchases] = useState<boolean>(true);
 
-
+    // Fetch Funds
     const fetchFunds = async () => {
         try {
             const response = await axios.get(
@@ -52,8 +61,6 @@ export default function BuyerProfilePage() {
                     ? JSON.parse(response.data.body)
                     : response.data;
             setdata(responseData);
-            
-            
         } catch (error) {
             console.error('Failed to fetch funds:', error);
             alert('Failed to fetch funds');
@@ -61,6 +68,7 @@ export default function BuyerProfilePage() {
         }
     };
 
+    // Add Funds
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
@@ -85,15 +93,11 @@ export default function BuyerProfilePage() {
         }
     };
 
+    // Fetch Active Bids
     const fetchActiveBids = async () => {
-
-        setLoading(true); //what is this??
-
-        console.log("getdata.id check",getdata?.id) // not workin.
-        console.log("username check",usernamedata) // working
+        setLoading(true);
 
         try {
-            console.log("username check",usernamedata)
             const response = await fetch(
                 'https://bprkevlvae.execute-api.us-east-1.amazonaws.com/review-active-bids/review-active-bids',
                 {
@@ -103,12 +107,8 @@ export default function BuyerProfilePage() {
                     },
                     body: JSON.stringify({ username: usernamedata }),
                 });
-            
-            console.log("username check",usernamedata)
 
             const responseData = await response.json();
-
-            console.log("API response data:", responseData);
 
             if (typeof responseData.body === 'string') {
                 const parsedBody = JSON.parse(responseData.body);
@@ -116,29 +116,54 @@ export default function BuyerProfilePage() {
             } else {
                 setBids(responseData.biddata?.bids || []);
             }
-            console.log("username check",usernamedata)
-
         } catch (error: any) {
-            setError(error.message)
+            setError(error.message);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
+    // Fetch Previous Purchases
+    const fetchPreviousPurchases = async () => {
+        setLoadingPurchases(true);
+        try {
+            const storedCredentials = secureLocalStorage.getItem("userCredentials");
+            const response = await axios.post(
+                'https://olie81hvk9.execute-api.us-east-1.amazonaws.com/reviewpurchases/reviewpurchases',
+                { buyer_ID: storedCredentials?.id },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
 
+            const responseData =
+                typeof response.data.body === 'string'
+                    ? JSON.parse(response.data.body)
+                    : response.data;
 
+            if (responseData.transactionData && responseData.transactionData.transactions) {
+                setPreviousPurchases(responseData.transactionData.transactions);
+            } else {
+                setPreviousPurchases([]);
+            }
+        } catch (error: any) {
+            console.error('Failed to fetch previous purchases:', error);
+        } finally {
+            setLoadingPurchases(false);
+        }
+    };
 
+    // useEffect to fetch data
     useEffect(() => {
         fetchFunds();
         fetchActiveBids();
-    }, []);
+        fetchPreviousPurchases();
+    }, [getdata?.id]);
 
     return (
         <div className="container mt-4">
             {/* Back Arrow Button */}
             <div className="mb-4">
-                <button 
-                    className="btn btn-primary" 
+                <button
+                    className="btn btn-primary"
                     onClick={() => navigate("/buyer")} // Navigate to buyerItemsPage
                 >
                     ← Back to Items
@@ -208,17 +233,43 @@ export default function BuyerProfilePage() {
                 <p>No active bids found.</p>
             )}
 
-                    {/* Close Account Section */}
+            {/* Previous Purchases Table */}
+            <h3>Previous Purchases</h3>
+            {loadingPurchases ? (
+                <p>Loading purchases...</p>
+            ) : previousPurchases.length > 0 ? (
+                <table className="table table-bordered mt-4">
+                    <thead>
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Seller ID</th>
+                            <th>Item ID</th>
+                            <th>Amount</th>
+                            <th>Transaction Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {previousPurchases.map((purchase, index) => (
+                            <tr key={index}>
+                                <td>{purchase.transaction_id}</td>
+                                <td>{purchase.seller_id}</td>
+                                <td>{purchase.item_id}</td>
+                                <td>${purchase.amount.toFixed(2)}</td>
+                                <td>{purchase.transaction_time}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ) : (
+                <p>No previous purchases found.</p>
+            )}
+
+            {/* Close Account Section */}
             <div className="card mt-4 p-4">
-                <div style={{ width: '200px'}}>
+                <div style={{ width: '200px' }}>
                     <CloseAccount id={getdata?.id} />
                 </div>
             </div>
-
-            {/* Logout Section */}
-            {/* <div className="card mt-4 p-4">
-                <Logout />
-            </div> */}
         </div>
     );
 }
