@@ -48,9 +48,9 @@ export default function BuyerItemDetail() {
   const [inputValue, setInputValue] = useState('');
   const [highestBid, setHighestBid] = useState<number | null>(null);
 
-  /*****************************************************************
-   * 1. FETCH BIDS (only if iType !== 'Buy_Now')
-   *****************************************************************/
+
+   //1. FETCH BIDS (only if iType !== 'Buy_Now')
+
   const fetchBids = async () => {
     if (!item.item_ID) {
       setError("Invalid item_ID provided.");
@@ -109,9 +109,9 @@ export default function BuyerItemDetail() {
     }
   }, [item.item_ID, item.iType]);
 
-  /*****************************************************************
-   * 2. PLACE A BID (Auction scenario)
-   *****************************************************************/
+
+   //2. PLACE A BID (Auction scenario)
+
   const bidItem = async () => {
     if (!accountInfo) {
       alert("Error: Must be logged in to place a bid.");
@@ -124,8 +124,6 @@ export default function BuyerItemDetail() {
       return;
     }
 
-    // You might want to also ensure user has enough funds, etc.
-    // For example: if (accountInfo.funds < amountToAdd) { ... }
 
     try {
       const response = await axios.post(
@@ -140,6 +138,8 @@ export default function BuyerItemDetail() {
       console.log("response: ", response);
       const alertMessage = JSON.parse(response.data.body);
       alert(alertMessage.message);
+
+      // Clear the input
       setInputValue('');
 
       // Refresh the bids list
@@ -150,9 +150,9 @@ export default function BuyerItemDetail() {
     }
   };
 
-  /*****************************************************************
-   * 3. BUY NOW (Buy_Now scenario)
-   *****************************************************************/
+
+   // 3. BUY NOW (Buy_Now scenario)
+
   const handleBuyNow = async () => {
     if (!accountInfo) {
       alert("Error: Must be logged in to purchase.");
@@ -197,12 +197,25 @@ export default function BuyerItemDetail() {
     }
   };
 
-  /*****************************************************************
-   * 4. RENDERING
-   *****************************************************************/
-  const minBid = highestBid && highestBid > 0
-    ? highestBid + 1
-    : item.iStartingPrice + 1;
+
+   // 4. RENDERING
+
+  let minBid = 0;
+  let isFirstBid = bids.length === 0;
+  if (isFirstBid) {
+    // First bid must be exactly the starting price
+    minBid = item.iStartingPrice;
+  } else {
+    // Subsequent bids must exceed the highest bid
+    minBid = (highestBid ?? 0) + 1;
+  }
+
+
+  useEffect(() => {
+    if (item.iType !== 'Buy_Now' && bids.length === 0) {
+      setInputValue(item.iStartingPrice.toString());
+    }
+  }, [bids, item.iType, item.iStartingPrice]);
 
   return (
     <div style={{ padding: '20px' }}>
@@ -253,7 +266,11 @@ export default function BuyerItemDetail() {
 
           {/* If there are no bids */}
           {!loading && bids.length === 0 && (
-            <p style={{ textAlign: 'center' }}>No bids found for this item.</p>
+            <p style={{ textAlign: 'center' }}>
+              No bids found for this item. 
+              <br />
+              <strong>The first bid must be ${item.iStartingPrice}.</strong>
+            </p>
           )}
 
           {/* Display bids */}
@@ -300,7 +317,8 @@ export default function BuyerItemDetail() {
               className="form-control"
               min={minBid}
               step="1"
-              // onKeyDown={(e) => e.preventDefault()} // optional: prevents manual typing
+              // Disable the input if it's the first bid (so it cannot be changed)
+              disabled={isFirstBid}
             />
             <button
               className="btn btn-primary mt-2"
