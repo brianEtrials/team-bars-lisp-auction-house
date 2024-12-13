@@ -161,55 +161,60 @@ export default function BuyerItemDetail() {
         <div style={{ textAlign: 'center', marginTop: '20px' }}>
           <button
             style={{
-              backgroundColor: accountInfo?.funds >= item.iStartingPrice ? 'green' : 'gray',
+              backgroundColor: 'green',
               color: 'white',
               padding: '10px 20px',
               border: 'none',
               borderRadius: '5px',
-              cursor: accountInfo?.funds >= item.iStartingPrice ? 'pointer' : 'not-allowed',
+              cursor: 'pointer',
               fontSize: '16px',
             }}
             onClick={async () => {
-              if (accountInfo?.funds >= item.iStartingPrice) {
-                try {
-                  const purchaseItem = async () => {
-                    const item_ID = item.item_ID;
-                    const usernamedata = accountInfo.username;
+              if (!accountInfo || !item) {
+                alert("Error: Account or item information is missing.");
+                return;
+              }
             
-                    console.log("Username:", usernamedata);
-                    console.log("Item ID:", item_ID);
-            
-                    // Call the purchase API
-                    await axios.post(
-                      'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
-                      { usernamedata, item_ID, funds: item.iStartingPrice }
-                    );
-                    try {
-                      await axios.post( 'https://ib158fhn7a.execute-api.us-east-1.amazonaws.com/buynow/buynow', { item_ID }, {
-                          headers: { 'Content-Type': 'application/json' },
-                        }
-                      );
-                      alert('Item completed successfully!');
-                    } catch (error: any) {
-                      console.error('Failed to complete item:', error.response || error.message);
-                      alert(
-                        'Failed to complete item: ' +
-                          (error.response ? error.response.data.message : error.message)
-                      );
-                    }
-                  };
-            
-                  await purchaseItem();
-                  alert('Purchase made successfully!');
-                } catch (error: any) {
-                  console.error('Failed to update funds or item status:', error);
-                  alert('Failed to update funds or item status. ' + error.message);
-                }
-              } else {
+              if (accountInfo.funds < item.iStartingPrice) {
                 alert("Insufficient funds to purchase this item.");
+                return;
+              }
+            
+              try {
+                // Attempt to place the bid
+                const response = await axios.post(
+                  'https://65jqn0vcg4.execute-api.us-east-1.amazonaws.com/placebid/placebid',
+                  {
+                    usernamedata: accountInfo.username,
+                    item_ID: item.item_ID,
+                    funds: item.iStartingPrice,
+                  },
+                  {
+                    headers: { 'Content-Type': 'application/json' },
+                  }
+                );
+                console.log('Bid placed successfully:', response.data);
+                // Attempt to complete the purchase
+                try {
+                  const buyNowResponse = await axios.post(
+                    'https://ib158fhn7a.execute-api.us-east-1.amazonaws.com/buynow/buynow',
+                    { item_ID: item.item_ID },
+                    {
+                      headers: { 'Content-Type': 'application/json' },
+                    }
+                  );
+                  console.log('Purchase completed successfully:', buyNowResponse.data);
+                  alert('Item purchased successfully!');
+                  navigate("/");
+                } catch (error) {
+                  console.error('Failed to complete the item:', error.response || error.message);
+                  alert('Failed to complete the purchase. Please try again.');
+                }
+              } catch (error) {
+                console.error('Failed to place the bid:', error.response || error.message);
+                alert('Failed to place the bid. Please try again.');
               }
             }}
-            disabled={accountInfo?.funds < item.iStartingPrice} // Disable button if funds are insufficient
           >
             Buy Now
           </button>
