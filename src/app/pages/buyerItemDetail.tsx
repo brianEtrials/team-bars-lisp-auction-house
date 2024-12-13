@@ -158,10 +158,6 @@ export default function BuyerItemDetail() {
       alert("Error: Must be logged in to purchase.");
       return;
     }
-    if (accountInfo.funds < item.iStartingPrice) {
-      alert("Insufficient funds to purchase this item.");
-      return;
-    }
 
     try {
       // 3A. Place a “bid” for the full Buy_Now price.
@@ -176,25 +172,33 @@ export default function BuyerItemDetail() {
       );
       console.log('Bid placed successfully:', response.data);
 
+      const alertMessage = JSON.parse(response.data.body);
+
+      alert(alertMessage.message);
       // 3B. Complete the purchase by calling another endpoint.
-      try {
-        const buyNowResponse = await axios.post(
-          'https://ib158fhn7a.execute-api.us-east-1.amazonaws.com/buynow/buynow',
-          { item_ID: item.item_ID },
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-        console.log('Purchase completed successfully:', buyNowResponse.data);
-        alert('Item purchased successfully!');
-        navigate("/");
-      } catch (err: any) {
-        console.error('Failed to complete the purchase:', err.message);
-        alert('Failed to complete the purchase: ' + err.message);
-      }
+      if (alertMessage !== `Buyer has insufficient funds.`) {
+        try {
+          const buyNowResponse = await axios.post(
+            'https://ib158fhn7a.execute-api.us-east-1.amazonaws.com/buynow/buynow',
+            { item_ID: item.item_ID },
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+          console.log('Purchase completed successfully:', buyNowResponse.data);
+          //alert('Item purchased successfully!');
+          navigate("/");
+        } catch (err: any) {
+          console.error('Failed to complete the purchase:', err.message);
+          alert('Failed to complete the purchase: ' + err.message);
+        }}
 
     } catch (err: any) {
       console.error('Failed to place a buy-now bid:', err.message);
-      alert('Failed to place a buy-now bid: ' + err.message);
+      alert('Failed to place a buy-now: ' + err.message);
     }
+
+
+
+
   };
 
 
