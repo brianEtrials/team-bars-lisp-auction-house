@@ -126,3 +126,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Credentials for login admin: username:admin, password:admin24 (login inside 'Sign in' page)
 - Item Name should always be unique
 - Price Range: enter i.e. '1 to 10' in the search field
+- When a buyer purchases an item, they are redirected to the home page. If they place a bid, they remain on the same page but cannot bid again to outbid themselves.
