@@ -40,7 +40,8 @@ export default function BuyerProfilePage() {
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const usernamedata = location.state?.username;
-    const accountInfo_id = location.state?.account_id;
+    const accountInfo_id = location.state?.id;
+    console.log("ID : ",accountInfo_id)
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [bids, setBids] = useState<ItemBidsView[]>([]);
@@ -72,6 +73,14 @@ export default function BuyerProfilePage() {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(e.target.value);
     };
+
+    const storedCredentials = secureLocalStorage.getItem("userCredentials");
+    
+    // Parse stored credentials if they are in JSON string format
+    const pCredentials =
+        typeof storedCredentials === "string"
+            ? JSON.parse(storedCredentials)
+            : storedCredentials;
 
     const addAmount = async () => {
         const amountToAdd = parseFloat(inputValue);
@@ -281,7 +290,7 @@ export default function BuyerProfilePage() {
             {/* Close Account Section */}
             <div className="card mt-4 p-4">
                 <div style={{ width: '200px' }}>
-                 <CloseAccount id={accountInfo_id} />
+                 <CloseAccount id={pCredentials.id} />  
                 </div>
             </div>
         </div>
