@@ -279,7 +279,7 @@ const toBase64 = (file: File): Promise<string> =>
         { item_ID },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      alert('Item status changed to archived successfully!');
+      alert('The end date has not yet arrived!');
       fetchItems();
     } catch (error: any) {
       console.error('Failed to update item to archived:', error.response || error.message);
