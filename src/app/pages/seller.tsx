@@ -121,10 +121,10 @@ const base64Image = await toBase64(imageFile);
 //--------------------------------------------Add s3 image code here----------------------------------
 
       //Post item data to add-item endpoint
-      await axios.post('https://rk6fe66yz1.execute-api.us-east-1.amazonaws.com/add-item', itemData, {
+      const additemresponse = await axios.post('https://rk6fe66yz1.execute-api.us-east-1.amazonaws.com/add-item', itemData, {
         headers: { 'Content-Type': 'application/json' }
       });
-      alert('Item added successfully!');
+      alert(additemresponse.data.body);
       setNewItem({ iName: '', iDescription: '', iImage: '', iStartingPrice: '', duration: '', iType: ''});
       setImageFile(null);
       fetchItems();
