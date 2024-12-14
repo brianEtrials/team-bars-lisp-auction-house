@@ -14,6 +14,7 @@ interface Item {
   iStartDate?: string;
   iEndDate?: string;
   iType?: string;
+  highestBid:string;
 }
 
 export default function ItemDetail() {
@@ -24,12 +25,22 @@ export default function ItemDetail() {
     const iStartingPrice = location.state.iStartingPrice; //as string;
     const iStartDate = location.state.iStartDate; //as string;
     const iEndDate = location.state.iEndDate; //as string;
+    const highestBid = location.state.highestBid;
     const iType = location.state.iType;
+    const navigate = useNavigate();
 
     console.log("state received from customer page : ", itemName)
 
     return (
         <div>
+          <div className="mb-4">
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate("/")}
+            >
+              ← Back to Items
+            </button>
+          </div>
           <h1>{itemName}</h1>
           <img
             src={
@@ -38,13 +49,20 @@ export default function ItemDetail() {
                 : URL.createObjectURL(iImage)
             }
             alt={itemName}
-            style={{ maxHeight: '200px', objectFit: 'cover' }}
+            style={{
+              display: 'block',
+              margin: '0 auto',
+              maxHeight: '300px',
+              objectFit: 'cover',
+            }}
           />
-          <p><strong>Description:</strong> {itemDescription}</p>
-          <p><strong>Starting Price:</strong> ${iStartingPrice}</p>
-          <p><strong>Start Date:</strong> {iStartDate || 'N/A'}</p>
-          <p><strong>End Date:</strong> {iEndDate || 'N/A'}</p>
-          <p><strong>Type:</strong> {iType || 'N/A'}</p>
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <p><strong>Description:</strong> {itemDescription}</p>
+            <p><strong>Price:</strong> ${iStartingPrice}</p>
+            <p><strong>Start Date:</strong> {iStartDate || 'N/A'}</p>
+            <p><strong>End Date:</strong> {iEndDate || 'N/A'}</p>
+            <p><strong>Type:</strong> {iType || 'N/A'}</p>
+          </div>
         </div>
       );
 }

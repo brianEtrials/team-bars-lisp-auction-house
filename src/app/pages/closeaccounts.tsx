@@ -29,8 +29,18 @@ const CloseAccount: React.FC<UserId> = ({ id }) => {
           headers: { "Content-Type": "application/json" },
         }
       );
-      console.log(response.data);
-      navigate("/");
+      const bodydata = JSON.parse(response.data.body);
+      const message = bodydata.message;
+      console.log("Parsed message:", message);
+      alert(message)
+      if ( message === "Account closed successfully")
+      {
+        navigate("/");
+      }
+      if(message==="Account closed successfully (no items or bids associated)"){
+        navigate("/");
+      }
+
     } catch (error) {
       console.error("Error during close account:", error);
     }

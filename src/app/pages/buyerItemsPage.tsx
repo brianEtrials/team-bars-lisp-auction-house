@@ -20,6 +20,7 @@ interface Item {
     iStartingPrice: number;
     iStartDate?: string;
     iEndDate?: string;
+    highestBid:number;
 }
 
 export default function BuyerItemsPage() {
@@ -129,8 +130,8 @@ export default function BuyerItemsPage() {
       const handleSortByPrice = (order: 'asc' | 'desc') => {
         const sorted = [...items].sort((a, b) =>
           order === 'asc'
-                ? a.iStartingPrice - b.iStartingPrice
-                : b.iStartingPrice - a.iStartingPrice
+                ? a.highestBid - b.highestBid
+                : b.highestBid - a.highestBid
             );
         setItems(sorted);
         setSortOrder(order);
@@ -188,7 +189,7 @@ export default function BuyerItemsPage() {
         console.log("Filtering by Price Range:", { minPrice, maxPrice });
       
         const filteredItems = items.filter((item) => {
-          const price = parseFloat(item.iStartingPrice as unknown as string);
+          const price = parseFloat(item.highestBid as unknown as string);
           console.log("Checking item price:", price, "Min:", minPrice, "Max:", maxPrice);
           return price >= minPrice && price <= maxPrice;
         });
@@ -214,7 +215,7 @@ export default function BuyerItemsPage() {
         (item) =>
           item.iName.toLowerCase().includes(query) ||
           item.iDescription.toLowerCase().includes(query) ||
-          item.iStartingPrice.toString().includes(query)
+          item.highestBid.toString().includes(query)
       );
     
 };
@@ -294,7 +295,7 @@ export default function BuyerItemsPage() {
             <h5 className="card-title text-truncate">{items.iName}</h5>
             <p className="card-text text-muted small text-truncate">{items.iDescription}</p>
             <p>
-              <strong>Price:</strong> ${items.iStartingPrice}
+              <strong>Price:</strong> ${items.highestBid}
             </p>
             <p>
               <strong>Start Date:</strong> {items.iStartDate || 'N/A'}

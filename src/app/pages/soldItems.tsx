@@ -20,6 +20,7 @@ interface Item {
     iStartingPrice: number;
     iStartDate?: string;
     iEndDate?: string;
+    iType:string;
 }
 
 export default function BuyerSoldItemsPage() {

@@ -15,6 +15,7 @@ interface Item {
   iEndDate?: string;
   iType: string;     // 'Auction' or 'Buy_Now'
   iStatus: string;
+  highestBid:string;
 }
 
 interface Bid {
@@ -256,7 +257,7 @@ export default function BuyerItemDetail() {
       {/* Item Details */}
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
         <p><strong>Description:</strong> {item.iDescription}</p>
-        <p><strong>Price:</strong> ${item.iStartingPrice}</p>
+        <p><strong>Price:</strong> ${item.highestBid}</p>
         <p><strong>Start Date:</strong> {item.iStartDate || 'N/A'}</p>
         <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
       </div>
@@ -264,7 +265,7 @@ export default function BuyerItemDetail() {
       {/* Auction / Bids Section */}
       {item.iType !== 'Buy_Now' && (
         <>
-          <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Bids</h2>
+          <h2 style={{ textAlign: 'center', marginTop: '30px' }}>{item.iType === "Buy_Now" ? "Buy Now" : "Place Bid"}</h2>
           {loading && <p style={{ textAlign: 'center' }}>Loading bids...</p>}
           {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
 

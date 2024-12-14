@@ -40,7 +40,7 @@ export default function BuyerProfilePage() {
     const [getdata, setdata] = useState<BuyerData>({});
     const [inputValue, setInputValue] = useState('');
     const usernamedata = location.state?.username;
-
+    const accountInfo_id = location.state?.account_id;
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [bids, setBids] = useState<ItemBidsView[]>([]);
@@ -128,20 +128,33 @@ export default function BuyerProfilePage() {
         setLoadingPurchases(true);
         try {
             const storedCredentials = secureLocalStorage.getItem("userCredentials");
-            const response = await axios.post(
-                'https://olie81hvk9.execute-api.us-east-1.amazonaws.com/reviewpurchases/reviewpurchases',
-                { buyer_ID: storedCredentials?.id },
-                { headers: { 'Content-Type': 'application/json' } }
-            );
-
-            const responseData =
-                typeof response.data.body === 'string'
-                    ? JSON.parse(response.data.body)
-                    : response.data;
-
-            if (responseData.transactionData && responseData.transactionData.transactions) {
-                setPreviousPurchases(responseData.transactionData.transactions);
+    
+            // Parse stored credentials if they are in JSON string format
+            const parsedCredentials =
+                typeof storedCredentials === "string"
+                    ? JSON.parse(storedCredentials)
+                    : storedCredentials;
+    
+            // Check if parsedCredentials is an object and has the id property
+            if (parsedCredentials && typeof parsedCredentials === "object" && "id" in parsedCredentials) {
+                const response = await axios.post(
+                    'https://olie81hvk9.execute-api.us-east-1.amazonaws.com/reviewpurchases/reviewpurchases',
+                    { buyer_ID: parsedCredentials.id },
+                    { headers: { 'Content-Type': 'application/json' } }
+                );
+    
+                const responseData =
+                    typeof response.data.body === 'string'
+                        ? JSON.parse(response.data.body)
+                        : response.data;
+    
+                if (responseData.transactionData && responseData.transactionData.transactions) {
+                    setPreviousPurchases(responseData.transactionData.transactions);
+                } else {
+                    setPreviousPurchases([]);
+                }
             } else {
+                console.error("Invalid stored credentials.");
                 setPreviousPurchases([]);
             }
         } catch (error: any) {
@@ -150,6 +163,7 @@ export default function BuyerProfilePage() {
             setLoadingPurchases(false);
         }
     };
+    
 
     // useEffect to fetch data
     useEffect(() => {
@@ -252,10 +266,10 @@ export default function BuyerProfilePage() {
                         {previousPurchases.map((purchase, index) => (
                             <tr key={index}>
                                 <td>{purchase.transaction_id}</td>
-                                <td>{purchase.seller_id}</td>
+                                <td>{purchase.seller_id}</td>   
                                 <td>{purchase.item_id}</td>
                                 <td>${purchase.amount.toFixed(2)}</td>
-                                <td>{purchase.transaction_time}</td>
+                                <td>{new Date(purchase.transaction_time).toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -267,7 +281,7 @@ export default function BuyerProfilePage() {
             {/* Close Account Section */}
             <div className="card mt-4 p-4">
                 <div style={{ width: '200px' }}>
-                    <CloseAccount id={getdata?.id} />
+                 <CloseAccount id={accountInfo_id} />
                 </div>
             </div>
         </div>

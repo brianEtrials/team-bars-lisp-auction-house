@@ -17,6 +17,8 @@ interface Item {
   iStartingPrice: number;
   iStartDate?: string;
   iEndDate?: string;
+  highestBid:number;
+
 }
 
 export default function CustomerPage() {
@@ -61,8 +63,8 @@ export default function CustomerPage() {
   const handleSortByPrice = (order: 'asc' | 'desc') => {
     const sorted = [...items].sort((a, b) =>
       order === 'asc'
-        ? a.iStartingPrice - b.iStartingPrice
-        : b.iStartingPrice - a.iStartingPrice
+        ? a.highestBid - b.highestBid
+        : b.highestBid - a.highestBid
     );
     setItems(sorted);
     setSortOrder(order);
@@ -111,7 +113,7 @@ export default function CustomerPage() {
     console.log("Filtering by Price Range:", { minPrice, maxPrice });
   
     const filteredItems = items.filter((item) => {
-      const price = parseFloat(item.iStartingPrice as unknown as string);
+      const price = parseFloat(item.highestBid as unknown as string);
       console.log("Checking item price:", price, "Min:", minPrice, "Max:", maxPrice);
       return price >= minPrice && price <= maxPrice;
     });
@@ -137,7 +139,7 @@ export default function CustomerPage() {
     (item) =>
       item.iName.toLowerCase().includes(query) ||
       item.iDescription.toLowerCase().includes(query) ||
-      item.iStartingPrice.toString().includes(query)
+      item.highestBid.toString().includes(query)
   );
 };
 
@@ -219,7 +221,7 @@ export default function CustomerPage() {
             <h5 className="card-title text-truncate">{items.iName}</h5>
             <p className="card-text text-muted small text-truncate">{items.iDescription}</p>
             <p>
-              <strong>Price:</strong> ${items.iStartingPrice}
+              <strong>Price:</strong> ${items.highestBid}
             </p>
             <p>
               <strong>Start Date:</strong> {items.iStartDate || 'N/A'}
@@ -240,163 +242,3 @@ export default function CustomerPage() {
   );
 }
 
-
-//--------------------------------------------good code------------------------------------
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import { useNavigate } from "react-router-dom";
-// import Container from "react-bootstrap/Container";
-// import Form from "react-bootstrap/Form";
-// import InputGroup from "react-bootstrap/InputGroup";
-// import Button from "react-bootstrap/Button";
-// import Dropdown from "react-bootstrap/Dropdown";
-// import DropdownButton from "react-bootstrap/DropdownButton";
-// import logo from '../../../img/logo.png';
-
-// interface Item {
-//   item_ID: number;
-//   iName: string;
-//   iDescription: string;
-//   iImage: string | File;
-//   iStartingPrice: number;
-//   iStartDate?: string;
-//   iEndDate?: string;
-// }
-
-// export default function CustomerPage() {
-//   const [items, setItems] = useState<Item[]>([]);
-//   const [search, setSearch] = useState('');
-//   const [sortCriteria, setSortCriteria] = useState<string>('Sort by'); // Track current sorting criteria
-//   const navigate = useNavigate();
-
-//   const fetchItemData = async () => {
-//     try {
-//       const response = await axios.get(
-//         'https://qw583oxspk.execute-api.us-east-1.amazonaws.com/cutomer-view/customerView'
-//       );
-//       const responseData = typeof response.data.body === 'string'
-//         ? JSON.parse(response.data.body)
-//         : response.data;
-
-//       if (responseData && responseData.itemdata && Array.isArray(responseData.itemdata.items)) {
-//         setItems(responseData.itemdata.items);
-//       } else {
-//         setItems([]);
-//       }
-//     } catch (error) {
-//       console.error('Failed to fetch items:', error);
-//       setItems([]);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchItemData();
-//   }, []);
-
-//   const sortItems = (criteria: string) => {
-//     let sorted = [...items];
-//     switch (criteria) {
-//       case 'Price: Low to High':
-//         sorted.sort((a, b) => a.iStartingPrice - b.iStartingPrice);
-//         break;
-//       case 'Price: High to Low':
-//         sorted.sort((a, b) => b.iStartingPrice - a.iStartingPrice);
-//         break;
-//       case 'Start Date: Earliest First':
-//         sorted.sort((a, b) => new Date(a.iStartDate || '').getTime() - new Date(b.iStartDate || '').getTime());
-//         break;
-//       case 'Start Date: Latest First':
-//         sorted.sort((a, b) => new Date(b.iStartDate || '').getTime() - new Date(a.iStartDate || '').getTime());
-//         break;
-//       case 'End Date: Earliest First':
-//         sorted.sort((a, b) => new Date(a.iEndDate || '').getTime() - new Date(b.iEndDate || '').getTime());
-//         break;
-//       case 'End Date: Latest First':
-//         sorted.sort((a, b) => new Date(b.iEndDate || '').getTime() - new Date(a.iEndDate || '').getTime());
-//         break;
-//       default:
-//         return; // No sorting
-//     }
-//     setItems(sorted);
-//     setSortCriteria(criteria);
-//   };
-
-//   return (
-//     <Container>
-//       {/* Header Section */}
-//       <div className="d-flex justify-content-between align-items-center mb-4">
-//         <img src={logo.src} width="70px" height="70px" alt="Logo" />
-//         <Button className="rounded-pill" onClick={() => navigate("/accounts")}>Sign in</Button>
-//       </div>
-
-//       {/* Search and Sort Section */}
-//       <div className="d-flex justify-content-between align-items-center mb-4">
-//         {/* Search Bar */}
-//         <InputGroup className="w-50">
-//           <Form.Control
-//             onChange={(e) => setSearch(e.target.value)}
-//             placeholder="Search items"
-//           />
-//         </InputGroup>
-
-//         {/* Sorting Dropdown */}
-//         <DropdownButton
-//           title={sortCriteria}
-//           className="btn-secondary"
-//           onSelect={(e) => sortItems(e || 'Sort by')}
-//         >
-//           <Dropdown.Item eventKey="Price: Low to High">Price: Low to High</Dropdown.Item>
-//           <Dropdown.Item eventKey="Price: High to Low">Price: High to Low</Dropdown.Item>
-//           <Dropdown.Item eventKey="Start Date: Earliest First">Start Date: Earliest First</Dropdown.Item>
-//           <Dropdown.Item eventKey="Start Date: Latest First">Start Date: Latest First</Dropdown.Item>
-//           <Dropdown.Item eventKey="End Date: Earliest First">End Date: Earliest First</Dropdown.Item>
-//           <Dropdown.Item eventKey="End Date: Latest First">End Date: Latest First</Dropdown.Item>
-//         </DropdownButton>
-//       </div>
-
-//       {/* Items Section */}
-//       <h2>Items</h2>
-//       <div className="row">
-//         {items.length > 0 ? (
-//           items.filter((item) => {
-//             return search.toLowerCase() === ''
-//               ? item
-//               : item.iName.toLowerCase().includes(search) ||
-//                 item.iDescription.toLowerCase().includes(search) ||
-//                 item.iStartingPrice.toString().includes(search);
-//           }).map((item, index) => (
-//             <div key={index} className="col-lg-3 col-md-6 col-sm-11 mb-4">
-//               <div
-//                 onClick={() => navigate("/ItemDetail", { state: { ...item } })}
-//                 className="card h-100 border-0 shadow-sm rounded-3"
-//               >
-//                 <img
-//                   src={typeof item.iImage === 'string' ? item.iImage : URL.createObjectURL(item.iImage)}
-//                   className="card-img-top"
-//                   alt={item.iName}
-//                   style={{
-//                     height: '200px',
-//                     objectFit: 'cover',
-//                     borderTopLeftRadius: '0.75rem',
-//                     borderTopRightRadius: '0.75rem',
-//                   }}
-//                 />
-//                 <div className="card-body text-center">
-//                   <h5 className="card-title text-truncate">{item.iName}</h5>
-//                   <p className="card-text text-muted small text-truncate">{item.iDescription}</p>
-//                   <p><strong>Price:</strong> ${item.iStartingPrice}</p>
-//                   <p><strong>Start Date:</strong> {item.iStartDate || 'N/A'}</p>
-//                   <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
-//                 </div>
-//               </div>
-//             </div>
-//           ))
-//         ) : (
-//           <p className="text-center">No items available</p>
-//         )}
-//       </div>
-//     </Container>
-//   );
-// }
-//--------------------------------------------good code------------------------------------

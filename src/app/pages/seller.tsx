@@ -19,6 +19,7 @@ interface Item {
   duration?: number;
   iType: string;
   iNumBids?: number;
+  highestBid:string;
 }
 
 export default function FetchItemsComponent() {
@@ -597,7 +598,8 @@ const toBase64 = (file: File): Promise<string> =>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item Name</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Description</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Image</th>
-              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Item Price</th>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Starting Price</th>
+              <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Current Price</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Start Date</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>End Date</th>
               <th style={{ border: '1px solid #ddd', padding: '10px', backgroundColor: '#f2f2f2' }}>Status</th>
@@ -615,6 +617,7 @@ const toBase64 = (file: File): Promise<string> =>
                 <td style={{ border: '1px solid #ddd', padding: '10px' }}>{item.iDescription}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}><img src={item.iImage instanceof File ? URL.createObjectURL(item.iImage) : item.iImage} alt={item.iName} width="100" /></td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.iStartingPrice}</td>
+                <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>${item.highestBid}</td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iStartDate : ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}> {item.iStatus !== 'inactive' ? item.iEndDate : ''} </td>
                 <td style={{ border: '1px solid #ddd', padding: '10px', textAlign: 'center' }}>{item.iStatus}</td>

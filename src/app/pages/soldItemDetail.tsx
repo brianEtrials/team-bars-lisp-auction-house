@@ -10,6 +10,7 @@ interface Item {
   iStartingPrice: number;
   iStartDate?: string;
   iEndDate?: string;
+  iType:string;
 }
 
 interface Bid {
@@ -108,7 +109,7 @@ export default function SoldItemDetail() {
         <p><strong>End Date:</strong> {item.iEndDate || 'N/A'}</p>
       </div>
 
-      <h2 style={{ textAlign: 'center', marginTop: '30px' }}>Bids</h2>
+      <h2 style={{ textAlign: 'center', marginTop: '30px' }}>{item.iType === "Buy_Now" ? "Buy Now" : "Place Bid"}</h2>
       {loading && <p style={{ textAlign: 'center' }}>Loading bids...</p>}
       {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
       {!loading && bids.length === 0 && <p style={{ textAlign: 'center' }}>No bids found for this item.</p>}
@@ -148,7 +149,7 @@ export default function SoldItemDetail() {
 
       {/* BID Button */}
       <div style={{ textAlign: 'center', marginTop: '20px' }}>
-        <button
+        {/* <button
           style={{
             backgroundColor: '#cccccc',
             color: '#fff',
@@ -161,7 +162,7 @@ export default function SoldItemDetail() {
           disabled
         >
           BID
-        </button>
+        </button> */}
       </div>
     </div>
   );
