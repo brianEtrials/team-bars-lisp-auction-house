@@ -228,7 +228,7 @@ export default function BuyerItemDetail() {
       <div className="mb-4">
         <button
           className="btn btn-primary"
-          onClick={() => navigate("/buyerItemDetail")}
+          onClick={() => navigate("/buyer")}
         >
           ← Back to Items
         </button>
