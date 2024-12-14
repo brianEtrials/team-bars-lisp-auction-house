@@ -124,7 +124,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Credentials for login buyer: username:testbuyer, password:test
 - Credentials for login seller: username:testseller, password:test
 - Credentials for login admin: username:admin, password:admin24 (login inside 'Sign in' page)
-- Item Name should always be unique. If an item is added and another item with the same name already exists, a pop-up window will display the message 'Item added successfully,' but the item will not appear in the review items table.
-- Price Range: enter i.e. '1 to 10' in the search field.
+- Item Name should always be unique.
+- Price Range: enter i.e. 'price 1 to 10' in the search field.
 - When a buyer purchases an item, they are redirected to the home page. If they place a bid, they remain on the same page but cannot bid again to outbid themselves.
 - When an item is purchased using the Buy Now option, the transaction is completed, and no other buyers can purchase it, even if the end date has not yet passed.
