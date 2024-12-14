@@ -274,12 +274,12 @@ const toBase64 = (file: File): Promise<string> =>
 
   const fulfillItem = async (item_ID: number) => {
     try {
-      await axios.post(
+      const fulfilledresponse = await axios.post(
         'https://tx40hp2dlj.execute-api.us-east-1.amazonaws.com/fulfill-Item/fulfill-item',
         { item_ID },
         { headers: { 'Content-Type': 'application/json' } }
       );
-      alert('The end date has not yet arrived!');
+      alert(fulfilledresponse.data.body);
       fetchItems();
     } catch (error: any) {
       console.error('Failed to update item to archived:', error.response || error.message);
