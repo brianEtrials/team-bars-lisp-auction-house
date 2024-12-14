@@ -186,7 +186,7 @@ export default function BuyerItemDetail() {
           );
           console.log('Purchase completed successfully:', buyNowResponse.data);
           //alert('Item purchased successfully!');
-          navigate("/");
+          navigate("/buyer");
         } catch (err: any) {
           console.error('Failed to complete the purchase:', err.message);
           alert('Failed to complete the purchase: ' + err.message);
@@ -228,7 +228,7 @@ export default function BuyerItemDetail() {
       <div className="mb-4">
         <button
           className="btn btn-primary"
-          onClick={() => navigate("/buyer")}
+          onClick={() => navigate("/buyerItemDetail")}
         >
           ← Back to Items
         </button>
