@@ -278,7 +278,11 @@ export default function BuyerProfilePage() {
                                 <td>{purchase.seller_id}</td>   
                                 <td>{purchase.item_id}</td>
                                 <td>${purchase.amount.toFixed(2)}</td>
-                                <td>{new Date(purchase.transaction_time).toLocaleString()}</td>
+                                <td>{new Date(
+    typeof purchase.transaction_time === 'number' && purchase.transaction_time < 10000000000 
+      ? purchase.transaction_time * 1000 
+      : purchase.transaction_time
+  ).toLocaleString()}</td>
                             </tr>
                         ))}
                     </tbody>
