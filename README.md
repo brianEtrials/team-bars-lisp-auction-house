@@ -130,3 +130,12 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - Price Range: enter i.e. 'price 1 to 10' in the search field.
 - When a buyer purchases an item, they are redirected to the home page. If they place a bid, they remain on the same page but cannot bid again to outbid themselves.
 - When an item is purchased using the Buy Now option, the transaction is completed, and no other buyers can purchase it, even if the end date has not yet passed.
+
+  # Auction House Screenshots:
+  
+![Example Image](auction_website/admin_auction_report.png)
+
+## Custom Size Example
+Using HTML for resizing:
+<img src="auction_website/admin_auction_report.png" alt="Example Image" width="400">
+
