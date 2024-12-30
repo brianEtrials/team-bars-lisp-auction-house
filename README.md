@@ -131,8 +131,15 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - When a buyer purchases an item, they are redirected to the home page. If they place a bid, they remain on the same page but cannot bid again to outbid themselves.
 - When an item is purchased using the Buy Now option, the transaction is completed, and no other buyers can purchase it, even if the end date has not yet passed.
 
-  # Auction House Screenshots:
+# Auction House Screenshots:
   
-## Admin
+## Admin Side
+<img src="auction_website/admin_login.png" alt="Example Image" width="400">
+<img src="auction_website/admin_dashboard.png" alt="Example Image" width="400">
+<img src="auction_website/admin_freeze_unfreeze_item.png" alt="Example Image" width="400">
 <img src="auction_website/admin_auction_report.png" alt="Example Image" width="400">
+<img src="auction_website/admin_forensic_report.png" alt="Example Image" width="400">
+
+
+
 
