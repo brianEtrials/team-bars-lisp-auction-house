@@ -133,9 +133,6 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
   # Auction House Screenshots:
   
-![Example Image](auction_website/admin_auction_report.png)
-
-## Custom Size Example
-Using HTML for resizing:
+## Admin
 <img src="auction_website/admin_auction_report.png" alt="Example Image" width="400">
 
