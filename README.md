@@ -132,13 +132,35 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - When an item is purchased using the Buy Now option, the transaction is completed, and no other buyers can purchase it, even if the end date has not yet passed.
 
 # Auction House Screenshots:
+
+## Landing Page - Customer Page
+<img src="auction_website/customer_page.png" alt="Example Image" width="400">
+<img src="auction_website/customer_view_item.png" alt="Example Image" width="400">
+<img src="auction_website/login_create_account.png" alt="Example Image" width="400">
+
   
 ## Admin Side
-<img src="auction_website/admin_login.png" alt="Example Image" width="400">
 <img src="auction_website/admin_dashboard.png" alt="Example Image" width="400">
 <img src="auction_website/admin_freeze_unfreeze_item.png" alt="Example Image" width="400">
 <img src="auction_website/admin_auction_report.png" alt="Example Image" width="400">
 <img src="auction_website/admin_forensic_report.png" alt="Example Image" width="400">
+
+## Seller Side
+<img src="auction_website/seller_1.png" alt="Example Image" width="400">
+<img src="auction_website/seller_2.png" alt="Example Image" width="400">
+
+## Buyer Side
+<img src="auction_website/buyer_view_active_items.png" alt="Example Image" width="400">
+<img src="auction_website/buyer_view_sold_items.png" alt="Example Image" width="400">
+<img src="auction_website/buyer_auction_item.png" alt="Example Image" width="400">
+<img src="auction_website/buyer_buy_now_item.png" alt="Example Image" width="400">
+<img src="auction_website/buyer_profile1.png" alt="Example Image" width="400">
+<img src="auction_website/buyer_profile2.png" alt="Example Image" width="400">
+
+
+
+
+
 
 
 
