@@ -4,11 +4,11 @@ This project is a full-stack web-based auction house platform that allows users 
 
 The platform provides the following key features:
 
-    Seller Capabilities: Sellers can create accounts, add items, publish them for auction, manage item details (e.g., descriptions, images, initial price), and track the status of their items. Once an auction ends, the seller is responsible for fulfilling the item and shipping it to the buyer.
+- Seller Capabilities: Sellers can create accounts, add items, publish them for auction, manage item details (e.g., descriptions, images, initial price), and track the status of their items. Once an auction ends, the seller is responsible for fulfilling the item and shipping it to the buyer.
 
-    Buyer Capabilities: Buyers can place bids on active items, search for items by keywords or price, and view bid histories. They can also review past purchases once the items have been fulfilled. Buyers must ensure they have enough funds to place bids.
-
-    Admin Functionality: Admins have control over freezing or unfreezing buyer and seller accounts, freezing specific items, and generating auction reports. Admins also have access to the auction funds and can generate forensic reports.
+- Buyer Capabilities: Buyers can place bids on active items, search for items by keywords or price, and view bid histories. They can also review past purchases once the items have been fulfilled. Buyers must ensure they have enough funds to place bids.
+  
+- Admin Functionality: Admins have control over freezing or unfreezing buyer and seller accounts, freezing specific items, and generating auction reports. Admins also have access to the auction funds and can generate forensic reports.
 
 The platform uses AWS for cloud hosting and scalable services but was taken down to avoid accruing ongoing costs, as it was incurring charges on AWS for hosting.
 
