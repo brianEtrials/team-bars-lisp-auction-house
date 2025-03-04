@@ -1,4 +1,16 @@
-# Auction House
+# Auction House System
+
+This project is a full-stack web-based auction house platform that allows users to create accounts as either sellers or buyers, manage auction items, place bids, and view past sales. Sellers can create, publish, and manage items, while buyers can search for items, place bids, and review active bids. The system is built with a robust backend that supports user authentication, item listings, and real-time bidding functionality.
+
+The platform provides the following key features:
+
+    Seller Capabilities: Sellers can create accounts, add items, publish them for auction, manage item details (e.g., descriptions, images, initial price), and track the status of their items. Once an auction ends, the seller is responsible for fulfilling the item and shipping it to the buyer.
+
+    Buyer Capabilities: Buyers can place bids on active items, search for items by keywords or price, and view bid histories. They can also review past purchases once the items have been fulfilled. Buyers must ensure they have enough funds to place bids.
+
+    Admin Functionality: Admins have control over freezing or unfreezing buyer and seller accounts, freezing specific items, and generating auction reports. Admins also have access to the auction funds and can generate forensic reports.
+
+The platform uses AWS for cloud hosting and scalable services but was taken down to avoid accruing ongoing costs, as it was incurring charges on AWS for hosting.
 
 DEMO - https://vimeo.com/1042981102?share=copy
 
